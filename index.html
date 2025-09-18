@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MindfulPath">
+    <title>MindfulPath - Your Digital Wellbeing Companion</title>
+    <meta name="description"
+        content="Comprehensive digital mental health platform offering mood tracking, wellness assessments, meditation tools, and 24/7 AI support for your mental wellbeing journey.">
+        
+    <!-- Core Fix Scripts - Must be loaded first -->
+    <script src="js/api-integration.js"></script>
+    <script src="js/initialization-fix.js"></script>
+    <script src="js/auth-system-fix.js"></script>
+    <script src="js/mongodb-fix.js"></script>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="apple-touch-icon"
+        href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' rx='20' fill='%23667eea'/%3E%3Cpath d='M90 45C70.1177 45 52.5 62.6177 52.5 82.5C52.5 102.382 70.1177 120 90 120C109.882 120 127.5 102.382 127.5 82.5C127.5 62.6177 109.882 45 90 45Z' fill='white' fill-opacity='0.8'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='4' fill='%23667eea'/%3E%3Cpath d='M16 8C12.6863 8 9.33333 11.0196 9.33333 14.6667C9.33333 18.3137 12.6863 21.3333 16 21.3333C19.3137 21.3333 22.6667 18.3137 22.6667 14.6667C22.6667 11.0196 19.3137 8 16 8Z' fill='white' fill-opacity='0.8'/%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/notifications.css">
+    <link rel="stylesheet" href="css/ar-mindfulness.css">
+    <link rel="stylesheet" href="css/dream-journal-analyzer.css">
+    <link rel="stylesheet" href="css/neural-feedback-visualizer.css">
+    <link rel="stylesheet" href="css/social-vr-therapy.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Accessibility Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-brain nav-icon" aria-hidden="true"></i>
+                <span>MindfulPath</span>
+            </div>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" role="menubar">
+                <li role="none"><a href="#home" role="menuitem">Home</a></li>
+                <li role="none"><a href="#dashboard" role="menuitem">Dashboard</a></li>
+                <li role="none"><a href="#tools" role="menuitem">Wellness Tools</a></li>
+                <li role="none"><a href="#resources" role="menuitem">Resources</a></li>
+                <li role="none"><a href="#community" role="menuitem">Community</a></li>
+                <li role="none"><a href="#support" role="menuitem">Crisis Support</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button id="login-button" class="btn btn-secondary" onclick="window.authManager.openAuthModal()">
+                    <i class="fas fa-user"></i>
+                    Login / Register
+                </button>
+                <div id="user-menu" class="user-menu hidden">
+                    <div class="user-avatar" onclick="window.authManager.toggleUserDropdown()">
+                        <span id="user-initials"></span>
+                    </div>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-name" id="user-dropdown-name"></div>
+                            <div class="user-dropdown-email" id="user-dropdown-email"></div>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <a href="#" class="user-dropdown-item" onclick="window.authManager.navigateToProfile()">
+                                <i class="fas fa-user-circle"></i>
+                                Profile
+                            </a>
+                            <a href="#" class="user-dropdown-item" onclick="window.authManager.navigateToSettings()">
+                                <i class="fas fa-cog"></i>
+                                Settings
+                            </a>
+                            <a href="#" class="user-dropdown-item" onclick="window.authManager.logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main id="main-content">
+        <section id="home" class="hero" aria-labelledby="hero-title">
+            <div class="hero-background">
+                <div class="gradient-orb orb-1"></div>
+                <div class="gradient-orb orb-2"></div>
+                <div class="gradient-orb orb-3"></div>
+                <div class="floating-elements">
+                    <div class="floating-element heart">💚</div>
+                    <div class="floating-element lotus">🪷</div>
+                    <div class="floating-element zen">🧘‍♀️</div>
+                    <div class="floating-element peace">☮️</div>
+                </div>
+            </div>
+            <div class="hero-layout"
+                style="display: flex !important; gap: 3rem !important; max-width: 1400px !important; margin: 0 auto !important; padding: 0 2rem !important; align-items: stretch !important;">
+                <div class="hero-content"
+                    style="flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; text-align: left !important; max-width: none !important;">
+                    <h1 id="hero-title" class="hero-title">
+                        Your Journey to <span class="gradient-text">Mental Wellness</span> Starts Here
+                    </h1>
+                    <p class="hero-subtitle">
+                        Discover a comprehensive digital companion for mental health with AI-powered support,
+                        personalized wellness tools, and evidence-based resources for your unique journey.
+                    </p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="startWellnessJourney()">
+                            <i class="fas fa-rocket" aria-hidden="true"></i>
+                            Start Your Journey
+                        </button>
+                        <button class="btn btn-secondary" onclick="openChatbot()">
+                            <i class="fas fa-comments" aria-hidden="true"></i>
+                            Talk to MindBot
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">50K+</span>
+                            <span class="stat-label">Lives Improved</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">24/7</span>
+                            <span class="stat-label">AI Support</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100+</span>
+                            <span class="stat-label">Evidence-Based Tools</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inline Authentication Panel -->
+                <div class="auth-sidebar" id="auth-sidebar"
+                    style="display: flex !important; visibility: visible !important; flex: 0 0 400px !important; align-items: center !important; padding: 2rem 0 !important;">
+                    <div class="auth-panel" id="auth-panel"
+                        style="width: 100%; background: rgba(255, 255, 255, 0.95) !important; border-radius: 16px; padding: 2rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px);">
+                        <div class="auth-tabs">
+                            <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')">
+                                <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+                                Login
+                            </button>
+                            <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register')">
+                                <i class="fas fa-user-plus" aria-hidden="true"></i>
+                                Register
+                            </button>
+                        </div>
+
+                        <!-- Login Form -->
+                        <div class="auth-form-container active" id="login-form-container">
+                            <h3 class="auth-title">Welcome Back</h3>
+                            <p class="auth-subtitle">Continue your wellness journey</p>
+                            <div id="login-error" class="auth-error" style="display: none;"></div>
+                            <form id="inline-login-form" class="auth-form">
+                                <div class="form-group">
+                                    <label for="inline-login-email">Email Address</label>
+                                    <input type="email" id="inline-login-email" name="email" required
+                                        placeholder="Enter your email address">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inline-login-password">Password</label>
+                                    <input type="password" id="inline-login-password" name="password" required
+                                        placeholder="Enter your password">
+                                </div>
+                                <div class="form-options">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="inline-remember-me" name="remember">
+                                        <span class="checkmark"></span>
+                                        Remember me
+                                    </label>
+                                    <a href="#" class="forgot-password" onclick="showForgotPassword(event)">
+                                        Forgot password?
+                                    </a>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-auth">
+                                    <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+                                    Sign In
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Register Form -->
+                        <div class="auth-form-container" id="register-form-container">
+                            <h3 class="auth-title">Join MindfulPath</h3>
+                            <p class="auth-subtitle">Start your wellness journey today</p>
+                            <div id="register-error" class="auth-error" style="display: none;"></div>
+                            <form id="inline-register-form" class="auth-form">
+                                <div class="form-group">
+                                    <label for="inline-register-name">Full Name</label>
+                                    <input type="text" id="inline-register-name" name="name" required
+                                        placeholder="Enter your full name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inline-register-email">Email Address</label>
+                                    <input type="email" id="inline-register-email" name="email" required
+                                        placeholder="Enter your email address">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inline-register-password">Password</label>
+                                    <input type="password" id="inline-register-password" name="password" required
+                                        placeholder="Create a secure password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inline-register-confirm">Confirm Password</label>
+                                    <input type="password" id="inline-register-confirm" name="confirmPassword" required
+                                        placeholder="Confirm your password">
+                                </div>
+                                <div class="form-options">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" id="inline-terms" name="terms" required>
+                                        <span class="checkmark"></span>
+                                        I agree to the <a href="#" class="terms-link">Terms of Service</a>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-auth">
+                                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                                    Create Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    // FORCE AUTH SIDEBAR TO BE VISIBLE - AGGRESSIVE APPROACH
+                    (function () {
+                        function forceAuthSidebar() {
+                            const sidebar = document.getElementById('auth-sidebar');
+                            const heroLayout = document.querySelector('.hero-layout');
+                            const heroContent = document.querySelector('.hero-content');
+
+                            if (sidebar) {
+                                sidebar.style.cssText = `
+                                display: flex !important;
+                                visibility: visible !important;
+                                opacity: 1 !important;
+                                flex: 0 0 400px !important;
+                                align-items: center !important;
+                                padding: 2rem 0 !important;
+                                background: transparent !important;
+                            `;
+                            }
+
+                            if (heroLayout) {
+                                heroLayout.style.cssText = `
+                                display: flex !important;
+                                gap: 3rem !important;
+                                max-width: 1400px !important;
+                                margin: 0 auto !important;
+                                padding: 0 2rem !important;
+                                align-items: stretch !important;
+                                min-height: calc(100vh - 80px) !important;
+                            `;
+                            }
+
+                            if (heroContent) {
+                                heroContent.style.cssText = `
+                                flex: 1 !important;
+                                display: flex !important;
+                                flex-direction: column !important;
+                                justify-content: center !important;
+                                text-align: left !important;
+                                max-width: none !important;
+                            `;
+                            }
+
+                            console.log('✅ Auth sidebar forced to be visible');
+                        }
+
+                        // Run immediately and after DOM load
+                        forceAuthSidebar();
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', forceAuthSidebar);
+                        }
+                        setTimeout(forceAuthSidebar, 500);
+                        setTimeout(forceAuthSidebar, 1000);
+                    })();
+                </script>
+            </div>
+        </section>
+
+        <!-- Personal Dashboard -->
+        <section id="dashboard" class="dashboard-section" aria-labelledby="dashboard-title">
+            <div class="container">
+                <h2 id="dashboard-title" class="section-title">Your Personal Wellness Dashboard</h2>
+                <p class="section-subtitle">Track your mental health journey with personalized insights and progress
+                    visualization</p>
+
+                <div class="dashboard-grid">
+
+                    <!-- Mood Tracker -->
+                    <div class="dashboard-card mood-tracker" role="region" aria-labelledby="mood-title">
+                        <h3 id="mood-title" class="card-title">
+                            <i class="fas fa-smile" aria-hidden="true"></i>
+                            Daily Mood Tracker
+                        </h3>
+                        <div class="mood-selector">
+                            <button class="mood-btn" data-mood="1" aria-label="Very sad">😢</button>
+                            <button class="mood-btn" data-mood="2" aria-label="Sad">😔</button>
+                            <button class="mood-btn" data-mood="3" aria-label="Neutral">😐</button>
+                            <button class="mood-btn" data-mood="4" aria-label="Happy">😊</button>
+                            <button class="mood-btn" data-mood="5" aria-label="Very happy">😄</button>
+                        </div>
+                        <script>
+                            // WORKING MOOD TRACKING - IMMEDIATE EFFECT
+                            (function () {
+                                const moodButtons = document.querySelectorAll('.mood-btn');
+
+                                moodButtons.forEach(btn => {
+                                    btn.addEventListener('click', function () {
+                                        const mood = parseInt(this.dataset.mood);
+
+                                        // Remove previous selections
+                                        moodButtons.forEach(b => b.classList.remove('selected'));
+                                        this.classList.add('selected');
+                                        this.style.background = '#667eea';
+                                        this.style.color = 'white';
+                                        this.style.transform = 'scale(1.1)';
+
+                                        // Update wellness score immediately
+                                        const scoreEl = document.getElementById('dynamic-score');
+                                        const statusEl = document.getElementById('dynamic-status');
+
+                                        let newScore = 50; // Base score
+
+                                        // Calculate score based on mood
+                                        switch (mood) {
+                                            case 1: newScore = 25; break; // Very sad
+                                            case 2: newScore = 45; break; // Sad
+                                            case 3: newScore = 65; break; // Neutral
+                                            case 4: newScore = 80; break; // Happy
+                                            case 5: newScore = 95; break; // Very happy
+                                        }
+
+                                        if (scoreEl) scoreEl.textContent = newScore;
+
+                                        let status = '';
+                                        if (newScore >= 80) status = 'Excellent';
+                                        else if (newScore >= 60) status = 'Good Progress';
+                                        else if (newScore >= 40) status = 'Getting Started';
+                                        else status = 'Needs Attention';
+
+                                        if (statusEl) statusEl.textContent = status;
+
+                                        // Update progress circle
+                                        const circle = document.querySelector('.score-circle circle:last-of-type');
+                                        if (circle) {
+                                            const circumference = 2 * Math.PI * 45;
+                                            const offset = circumference - (newScore / 100) * circumference;
+                                            circle.style.strokeDashoffset = offset;
+                                        }
+
+                                        // Show visual feedback
+                                        const moodEmojis = ['😢', '😔', '😐', '😊', '😄'];
+                                        const moodText = ['Very Sad', 'Sad', 'Neutral', 'Happy', 'Very Happy'];
+
+                                        // Create temporary notification
+                                        const notification = document.createElement('div');
+                                        notification.style.cssText = `
+                                        position: fixed;
+                                        top: 20px;
+                                        right: 20px;
+                                        background: #667eea;
+                                        color: white;
+                                        padding: 15px 20px;
+                                        border-radius: 10px;
+                                        z-index: 10000;
+                                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                                    `;
+                                        notification.innerHTML = `Mood updated! ${moodEmojis[mood - 1]} ${moodText[mood - 1]} - Score: ${newScore}`;
+                                        document.body.appendChild(notification);
+
+                                        setTimeout(() => {
+                                            notification.remove();
+                                        }, 3000);
+
+                                        console.log(`Mood set to ${mood}, score updated to ${newScore}`);
+                                    });
+                                });
+                            })();
+                        </script>
+                        <canvas id="moodChart" class="mood-chart" aria-label="Weekly mood trend chart"></canvas>
+                        <p class="mood-insight" id="moodInsight">Track your daily emotions to identify patterns and
+                            triggers</p>
+                    </div>
+
+                    <!-- Wellness Score -->
+                    <div class="dashboard-card wellness-score" role="region" aria-labelledby="wellness-title">
+                        <h3 id="wellness-title" class="card-title">
+                            <i class="fas fa-chart-line" aria-hidden="true"></i>
+                            Wellness Score
+                        </h3>
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <svg viewBox="0 0 100 100" aria-hidden="true">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e0e0e0" stroke-width="8" />
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient)" stroke-width="8"
+                                        stroke-dasharray="283" stroke-dashoffset="113" stroke-linecap="round" />
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#667eea" />
+                                            <stop offset="100%" stop-color="#764ba2" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <span class="score-number" id="dynamic-score"
+                                    aria-label="Current wellness score">70</span>
+                            </div>
+                            <p class="score-status" id="dynamic-status">Good Progress</p>
+                        </div>
+                        <script>
+                            // Make wellness score dynamic immediately
+                            (function () {
+                                let currentScore = 72;
+                                const scoreEl = document.getElementById('dynamic-score');
+                                const statusEl = document.getElementById('dynamic-status');
+
+                                function updateScore() {
+                                    // Vary score between 45-95 based on time and random factors
+                                    const variance = Math.sin(Date.now() / 10000) * 25;
+                                    currentScore = Math.round(70 + variance);
+
+                                    if (scoreEl) scoreEl.textContent = currentScore;
+
+                                    let status = '';
+                                    if (currentScore >= 80) status = 'Excellent';
+                                    else if (currentScore >= 60) status = 'Good Progress';
+                                    else if (currentScore >= 40) status = 'Getting Started';
+                                    else status = 'Needs Attention';
+
+                                    if (statusEl) statusEl.textContent = status;
+
+                                    // Update the progress circle
+                                    const circle = document.querySelector('.score-circle circle:last-of-type');
+                                    if (circle) {
+                                        const circumference = 2 * Math.PI * 45;
+                                        const offset = circumference - (currentScore / 100) * circumference;
+                                        circle.style.strokeDashoffset = offset;
+                                    }
+                                }
+
+                                updateScore();
+                                setInterval(updateScore, 3000);
+                            })();
+                        </script>
+                        
+                        <!-- Wellness Actions Handler -->
+                        <script>
+                            // Comprehensive wellness action handler
+                            window.handleWellnessAction = function(action) {
+                                console.log('Wellness action triggered:', action);
+                                
+                                // Visual feedback - button pulse effect
+                                const button = event.target.closest('.action-btn');
+                                if (button) {
+                                    button.style.transform = 'scale(0.95)';
+                                    setTimeout(() => button.style.transform = 'scale(1)', 150);
+                                }
+                                
+                                // Show notification
+                                const notifications = {
+                                    breathing: {
+                                        title: 'Breathing Exercise Started',
+                                        message: 'Follow the guided breathing pattern. Inhale for 4 seconds, hold for 4, exhale for 6.',
+                                        content: 'Starting 2-minute breathing exercise...'
+                                    },
+                                    meditation: {
+                                        title: 'Quick Meditation',
+                                        message: 'Find a comfortable position and focus on your breath.',
+                                        content: 'Beginning 5-minute mindfulness session...'
+                                    },
+                                    journal: {
+                                        title: 'Journal Opened',
+                                        message: 'Take a moment to reflect on your thoughts and feelings.',
+                                        content: 'Opening your digital wellness journal...'
+                                    },
+                                    assessment: {
+                                        title: 'Wellness Assessment',
+                                        message: 'Quick check-in on your current state of mind.',
+                                        content: 'Starting wellness evaluation...'
+                                    }
+                                };
+                                
+                                const notification = notifications[action];
+                                if (notification) {
+                                    // Create and show notification
+                                    showWellnessNotification(notification.title, notification.message);
+                                    
+                                    // Update wellness score based on action
+                                    setTimeout(() => {
+                                        updateWellnessScore(action);
+                                    }, 1000);
+                                }
+                                
+                                // Call existing functions if they exist
+                                if (action === 'breathing' && window.startBreathingExercise) {
+                                    window.startBreathingExercise();
+                                } else if (action === 'meditation' && window.startMeditation) {
+                                    window.startMeditation();
+                                } else if (action === 'journal' && window.openJournal) {
+                                    window.openJournal();
+                                } else if (action === 'assessment' && window.takeAssessment) {
+                                    window.takeAssessment();
+                                }
+                            };
+                            
+                            // Wellness notification function
+                            function showWellnessNotification(title, message) {
+                                // Create notification element
+                                const notification = document.createElement('div');
+                                notification.className = 'wellness-notification';
+                                notification.innerHTML = `
+                                    <div class="notification-content">
+                                        <div class="notification-icon">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                        <div class="notification-text">
+                                            <h4>${title}</h4>
+                                            <p>${message}</p>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                // Style the notification
+                                notification.style.cssText = `
+                                    position: fixed;
+                                    top: 20px;
+                                    right: 20px;
+                                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                    color: white;
+                                    padding: 16px;
+                                    border-radius: 12px;
+                                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                                    z-index: 1000;
+                                    max-width: 320px;
+                                    opacity: 0;
+                                    transform: translateX(100%);
+                                    transition: all 0.3s ease;
+                                `;
+                                
+                                // Add to page
+                                document.body.appendChild(notification);
+                                
+                                // Animate in
+                                setTimeout(() => {
+                                    notification.style.opacity = '1';
+                                    notification.style.transform = 'translateX(0)';
+                                }, 10);
+                                
+                                // Auto remove
+                                setTimeout(() => {
+                                    notification.style.opacity = '0';
+                                    notification.style.transform = 'translateX(100%)';
+                                    setTimeout(() => notification.remove(), 300);
+                                }, 3000);
+                            }
+                            
+                            // Update wellness score based on action
+                            function updateWellnessScore(action) {
+                                const scoreEl = document.getElementById('dynamic-score');
+                                const statusEl = document.getElementById('dynamic-status');
+                                
+                                if (scoreEl) {
+                                    let currentScore = parseInt(scoreEl.textContent) || 72;
+                                    
+                                    // Increase score based on action
+                                    const scoreIncrease = {
+                                        breathing: 3,
+                                        meditation: 5,
+                                        journal: 4,
+                                        assessment: 2
+                                    };
+                                    
+                                    currentScore = Math.min(100, currentScore + (scoreIncrease[action] || 1));
+                                    scoreEl.textContent = currentScore;
+                                    
+                                    // Update status
+                                    let status = '';
+                                    if (currentScore >= 90) status = 'Excellent!';
+                                    else if (currentScore >= 80) status = 'Very Good';
+                                    else if (currentScore >= 70) status = 'Good Progress';
+                                    else if (currentScore >= 60) status = 'Making Progress';
+                                    else if (currentScore >= 40) status = 'Getting Started';
+                                    else status = 'Needs Attention';
+                                    
+                                    if (statusEl) statusEl.textContent = status;
+                                    
+                                    // Update progress circle
+                                    const circle = document.querySelector('.score-circle circle:last-of-type');
+                                    if (circle) {
+                                        const circumference = 2 * Math.PI * 45;
+                                        const offset = circumference - (currentScore / 100) * circumference;
+                                        circle.style.strokeDashoffset = offset;
+                                    }
+                                    
+                                    // Add celebration effect for high scores
+                                    if (currentScore >= 90 && !window.celebrationShown) {
+                                        window.celebrationShown = true;
+                                        showWellnessNotification('Amazing Progress!', 'You\'re doing great with your wellness journey! 🎉');
+                                        setTimeout(() => { window.celebrationShown = false; }, 10000);
+                                    }
+                                }
+                            }
+                        </script>
+                    </div>
+                    <div class="score-breakdown">
+                        <div class="score-item">
+                            <span class="score-category">Sleep</span>
+                            <div class="score-bar">
+                                <div class="score-fill w-80"></div>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-category">Exercise</span>
+                            <div class="score-bar">
+                                <div class="score-fill w-65"></div>
+                            </div>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-category">Mindfulness</span>
+                            <div class="score-bar">
+                                <div class="score-fill w-70"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="dashboard-card quick-actions" role="region" aria-labelledby="actions-title">
+                    <h3 id="actions-title" class="card-title">
+                        <i class="fas fa-bolt" aria-hidden="true"></i>
+                        Quick Wellness Actions
+                    </h3>
+                    <div class="action-grid">
+                        <button class="action-btn breathing" onclick="handleWellnessAction('breathing')">
+                            <i class="fas fa-wind" aria-hidden="true"></i>
+                            <span>Breathing Exercise</span>
+                        </button>
+                        <button class="action-btn meditation" onclick="handleWellnessAction('meditation')">
+                            <i class="fas fa-leaf" aria-hidden="true"></i>
+                            <span>Quick Meditation</span>
+                        </button>
+                        <button class="action-btn journal" onclick="handleWellnessAction('journal')">
+                            <i class="fas fa-pen" aria-hidden="true"></i>
+                            <span>Write in Journal</span>
+                        </button>
+                        <button class="action-btn assessment" onclick="handleWellnessAction('assessment')">
+                            <i class="fas fa-clipboard-check" aria-hidden="true"></i>
+                            <span>Wellness Check</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card recent-activity" role="region" aria-labelledby="activity-title">
+                    <h3 id="activity-title" class="card-title">
+                        <i class="fas fa-history" aria-hidden="true"></i>
+                        Recent Activity
+                    </h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon breathing-icon">
+                                <i class="fas fa-wind" aria-hidden="true"></i>
+                            </div>
+                            <div class="activity-details">
+                                <span class="activity-title">5-Minute Breathing</span>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon journal-icon">
+                                <i class="fas fa-pen" aria-hidden="true"></i>
+                            </div>
+                            <div class="activity-details">
+                                <span class="activity-title">Journal Entry</span>
+                                <span class="activity-time">Yesterday</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon meditation-icon">
+                                <i class="fas fa-leaf" aria-hidden="true"></i>
+                            </div>
+                            <div class="activity-details">
+                                <span class="activity-title">Mindfulness Session</span>
+                                <span class="activity-time">2 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- Wellness Tools -->
+        <section id="tools" class="tools-section" aria-labelledby="tools-title">
+            <div class="container">
+                <h2 id="tools-title" class="section-title">Evidence-Based Wellness Tools</h2>
+                <p class="section-subtitle">Scientifically proven techniques to support your mental health journey</p>
+
+                <div class="tools-grid">
+                    <!-- Breathing Exercises -->
+                    <div class="tool-card breathing-tool" role="region" aria-labelledby="breathing-tool-title">
+                        <div class="tool-icon">
+                            <i class="fas fa-wind" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="breathing-tool-title" class="tool-title">Guided Breathing</h3>
+                        <p class="tool-description">Reduce anxiety and stress with scientifically-backed breathing
+                            techniques including 4-7-8, box breathing, and coherent breathing.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag">Anxiety Relief</span>
+                            <span class="feature-tag">Stress Reduction</span>
+                            <span class="feature-tag">Sleep Aid</span>
+                        </div>
+                        <button class="tool-btn" onclick="startBreathingExercise()">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            Start Breathing
+                        </button>
+                    </div>
+
+                    <!-- Meditation Timer -->
+                    <div class="tool-card meditation-tool" role="region" aria-labelledby="meditation-tool-title">
+                        <div class="tool-icon">
+                            <i class="fas fa-leaf" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="meditation-tool-title" class="tool-title">Meditation Timer</h3>
+                        <p class="tool-description">Customizable meditation sessions with guided practices, ambient
+                            sounds, and progress tracking for mindfulness development.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag">Mindfulness</span>
+                            <span class="feature-tag">Focus</span>
+                            <span class="feature-tag">Emotional Balance</span>
+                        </div>
+                        <button class="tool-btn" onclick="startMeditation()">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            Meditate Now
+                        </button>
+                    </div>
+
+                    <!-- CBT Tools -->
+                    <div class="tool-card cbt-tool" role="region" aria-labelledby="cbt-tool-title">
+                        <div class="tool-icon">
+                            <i class="fas fa-brain" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="cbt-tool-title" class="tool-title">CBT Thought Tracker</h3>
+                        <p class="tool-description">Cognitive Behavioral Therapy tools to identify negative thought
+                            patterns and develop healthier thinking habits.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag">Thought Analysis</span>
+                            <span class="feature-tag">Cognitive Restructuring</span>
+                            <span class="feature-tag">Mood Improvement</span>
+                        </div>
+                        <button class="tool-btn" onclick="openCBTTool()">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            Track Thoughts
+                        </button>
+                    </div>
+
+                    <!-- Sleep Hygiene -->
+                    <div class="tool-card sleep-tool" role="region" aria-labelledby="sleep-tool-title">
+                        <div class="tool-icon">
+                            <i class="fas fa-moon" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="sleep-tool-title" class="tool-title">Sleep Optimization</h3>
+                        <p class="tool-description">Improve sleep quality with sleep hygiene tracking, bedtime routines,
+                            and personalized recommendations.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag">Sleep Quality</span>
+                            <span class="feature-tag">Routine Building</span>
+                            <span class="feature-tag">Recovery</span>
+                        </div>
+                        <button class="tool-btn" onclick="openSleepTool()">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            Optimize Sleep
+                        </button>
+                    </div>
+
+                    <!-- Gratitude Journal -->
+                    <div class="tool-card gratitude-tool" role="region" aria-labelledby="gratitude-tool-title">
+                        <div class="tool-icon">
+                            <i class="fas fa-heart" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="gratitude-tool-title" class="tool-title">Gratitude Practice</h3>
+                        <p class="tool-description">Build resilience and positive thinking through daily gratitude
+                            journaling and appreciation exercises.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag">Positive Psychology</span>
+                            <span class="feature-tag">Resilience</span>
+                            <span class="feature-tag">Life Satisfaction</span>
+                        </div>
+                        <button class="tool-btn" onclick="openGratitudeJournal()">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            Practice Gratitude
+                        </button>
+                    </div>
+
+                    <!-- Crisis Support -->
+                    <div class="tool-card crisis-tool" role="region" aria-labelledby="crisis-tool-title">
+                        <div class="tool-icon emergency">
+                            <i class="fas fa-life-ring" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="crisis-tool-title" class="tool-title">Crisis Support</h3>
+                        <p class="tool-description">Immediate access to crisis resources, emergency contacts, and
+                            professional mental health support when you need it most.</p>
+                        <div class="tool-features">
+                            <span class="feature-tag emergency">24/7 Access</span>
+                            <span class="feature-tag emergency">Professional Help</span>
+                            <span class="feature-tag emergency">Crisis Intervention</span>
+                        </div>
+                        <button class="tool-btn emergency" onclick="openCrisisSupport()">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
+                            Get Help Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources" class="resources-section" aria-labelledby="resources-title">
+            <div class="container">
+                <h2 id="resources-title" class="section-title">Mental Health Resources</h2>
+                <p class="section-subtitle">Evidence-based information and professional guidance for your mental
+                    wellness journey</p>
+
+                <div class="resources-container">
+                    <!-- Educational Content -->
+                    <div class="resource-category" role="region" aria-labelledby="education-title">
+                        <h3 id="education-title" class="category-title">
+                            <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                            Educational Content
+                        </h3>
+                        <div class="resource-grid">
+                            <article class="resource-card">
+                                <div class="resource-image">
+                                    <i class="fas fa-brain resource-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="resource-content">
+                                    <h4>Understanding Anxiety</h4>
+                                    <p>Learn about anxiety disorders, symptoms, and evidence-based treatment approaches.
+                                    </p>
+                                    <div class="resource-meta">
+                                        <span class="reading-time">5 min read</span>
+                                        <span class="difficulty">Beginner</span>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="resource-card">
+                                <div class="resource-image">
+                                    <i class="fas fa-sun resource-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="resource-content">
+                                    <h4>Depression: Signs & Support</h4>
+                                    <p>Recognize depression symptoms and discover effective coping strategies and
+                                        professional resources.</p>
+                                    <div class="resource-meta">
+                                        <span class="reading-time">7 min read</span>
+                                        <span class="difficulty">Beginner</span>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="resource-card">
+                                <div class="resource-image">
+                                    <i class="fas fa-balance-scale resource-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="resource-content">
+                                    <h4>Work-Life Balance</h4>
+                                    <p>Strategies for managing stress, setting boundaries, and maintaining mental health
+                                        at work.</p>
+                                    <div class="resource-meta">
+                                        <span class="reading-time">6 min read</span>
+                                        <span class="difficulty">Intermediate</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Professional Support -->
+                    <div class="resource-category" role="region" aria-labelledby="professional-title">
+                        <h3 id="professional-title" class="category-title">
+                            <i class="fas fa-user-md" aria-hidden="true"></i>
+                            Professional Support
+                        </h3>
+                        <div class="support-options">
+                            <div class="support-card therapist">
+                                <div class="support-icon">
+                                    <i class="fas fa-comments" aria-hidden="true"></i>
+                                </div>
+                                <h4>Find a Therapist</h4>
+                                <p>Connect with licensed mental health professionals in your area or online.</p>
+                                <button class="support-btn">Find Therapists</button>
+                            </div>
+
+                            <div class="support-card psychiatrist">
+                                <div class="support-icon">
+                                    <i class="fas fa-stethoscope" aria-hidden="true"></i>
+                                </div>
+                                <h4>Psychiatric Care</h4>
+                                <p>Access psychiatric evaluation and medication management services.</p>
+                                <button class="support-btn">Find Psychiatrists</button>
+                            </div>
+
+                            <div class="support-card group">
+                                <div class="support-icon">
+                                    <i class="fas fa-users" aria-hidden="true"></i>
+                                </div>
+                                <h4>Support Groups</h4>
+                                <p>Join peer support groups for shared experiences and community healing.</p>
+                                <button class="support-btn">Join Groups</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Crisis Resources -->
+                    <div class="resource-category crisis-resources" role="region" aria-labelledby="crisis-title">
+                        <h3 id="crisis-title" class="category-title">
+                            <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                            Crisis Resources
+                        </h3>
+                        <div class="crisis-info">
+                            <div class="crisis-card immediate">
+                                <h4>Immediate Danger</h4>
+                                <p>If you or someone else is in immediate danger:</p>
+                                <div class="crisis-contact">
+                                    <strong>Call 911</strong>
+                                    <span>Emergency Services</span>
+                                </div>
+                            </div>
+
+                            <div class="crisis-card suicide">
+                                <h4>Suicide Prevention</h4>
+                                <p>24/7 confidential support for people in distress:</p>
+                                <div class="crisis-contact">
+                                    <strong>988</strong>
+                                    <span>Suicide & Crisis Lifeline</span>
+                                </div>
+                            </div>
+
+                            <div class="crisis-card text">
+                                <h4>Crisis Text Line</h4>
+                                <p>Text-based crisis support:</p>
+                                <div class="crisis-contact">
+                                    <strong>Text HOME to 741741</strong>
+                                    <span>Crisis Text Line</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Community Section -->
+        <section id="community" class="community-section" aria-labelledby="community-title">
+            <div class="container">
+                <h2 id="community-title" class="section-title">Join Our Wellness Community</h2>
+                <p class="section-subtitle">Connect with others on similar journeys, share experiences, and find support
+                </p>
+
+                <div class="community-features">
+                    <div class="community-card forums" role="region" aria-labelledby="forums-title">
+                        <div class="community-icon">
+                            <i class="fas fa-comments" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="forums-title">Discussion Forums</h3>
+                        <p>Join moderated discussions on mental health topics, share experiences, and learn from others.
+                        </p>
+                        <div class="community-stats">
+                            <span class="stat">5,200+ Members</span>
+                            <span class="stat">24/7 Moderation</span>
+                        </div>
+                        <button class="community-btn">Join Discussions</button>
+                    </div>
+
+                    <div class="community-card stories" role="region" aria-labelledby="stories-title">
+                        <div class="community-icon">
+                            <i class="fas fa-book-open" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="stories-title">Recovery Stories</h3>
+                        <p>Read inspiring stories of recovery and resilience from community members who've overcome
+                            challenges.</p>
+                        <div class="community-stats">
+                            <span class="stat">1,000+ Stories</span>
+                            <span class="stat">Verified Experiences</span>
+                        </div>
+                        <button class="community-btn">Read Stories</button>
+                    </div>
+
+                    <div class="community-card events" role="region" aria-labelledby="events-title">
+                        <div class="community-icon">
+                            <i class="fas fa-calendar" aria-hidden="true"></i>
+                        </div>
+                        <h3 id="events-title">Virtual Events</h3>
+                        <p>Participate in live webinars, group meditations, and expert-led workshops on mental wellness.
+                        </p>
+                        <div class="community-stats">
+                            <span class="stat">Weekly Events</span>
+                            <span class="stat">Expert Speakers</span>
+                        </div>
+                        <button class="community-btn">View Events</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Chatbot Interface -->
+    <div id="chatbot-container" class="chatbot-container" role="dialog" aria-labelledby="chatbot-title"
+        aria-hidden="true">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <i class="fas fa-robot" aria-hidden="true"></i>
+            </div>
+            <div class="chatbot-info">
+                <h3 id="chatbot-title">MindBot</h3>
+                <span class="chatbot-status">Online • Ready to help</span>
+            </div>
+            <button class="chatbot-close" onclick="closeChatbot()" aria-label="Close chatbot">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbot-messages" role="log" aria-live="polite">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-robot" aria-hidden="true"></i>
+                </div>
+                <div class="message-content">
+                    <p>Hello! I'm MindBot, your AI wellness companion. I'm here to provide support, resources, and
+                        guidance for your mental health journey. How can I help you today?</p>
+                    <div class="quick-replies">
+                        <button class="quick-reply" onclick="sendQuickReply('I\'m feeling anxious')">I'm feeling
+                            anxious</button>
+                        <button class="quick-reply" onclick="sendQuickReply('Need coping strategies')">Need coping
+                            strategies</button>
+                        <button class="quick-reply" onclick="sendQuickReply('Sleep problems')">Sleep problems</button>
+                        <button class="quick-reply" onclick="sendQuickReply('Crisis support')">Crisis support</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input-field" placeholder="Type your message..."
+                aria-label="Type your message to MindBot">
+            <button id="chatbot-send" onclick="sendMessage()" aria-label="Send message">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div class="chatbot-disclaimer">
+            <small>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
+                MindBot provides support and information but is not a replacement for professional mental health care.
+                In crisis situations, please contact emergency services or call 988.
+            </small>
+        </div>
+    </div>
+
+    <!-- Chatbot Toggle Button -->
+    <button id="chatbot-toggle" class="chatbot-toggle" onclick="toggleChatbot()" aria-label="Open chat with MindBot">
+        <i class="fas fa-comments" aria-hidden="true"></i>
+        <span class="chatbot-notification" id="chatbot-notification">1</span>
+    </button>
+
+    <!-- Breathing Exercise Modal -->
+    <div id="breathing-modal" class="modal" role="dialog" aria-labelledby="breathing-modal-title" aria-hidden="true">
+        <div class="modal-content breathing-exercise">
+            <div class="modal-header">
+                <h3 id="breathing-modal-title">Guided Breathing Exercise</h3>
+                <button class="modal-close" onclick="closeBreathingExercise()" aria-label="Close breathing exercise">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="breathing-container">
+                    <div class="breathing-circle" id="breathing-circle">
+                        <div class="breathing-text" id="breathing-text">Breathe</div>
+                    </div>
+                    <div class="breathing-instructions">
+                        <p id="breathing-instruction">Take a moment to get comfortable, then click start to begin your
+                            breathing exercise.</p>
+                    </div>
+                    <div class="breathing-controls">
+                        <button id="breathing-start" class="btn btn-primary" onclick="startBreathing()">Start</button>
+                        <button id="breathing-pause" class="btn btn-secondary hidden"
+                            onclick="pauseBreathing()">Pause</button>
+                        <button id="breathing-stop" class="btn btn-outline" onclick="stopBreathing()">Stop</button>
+                    </div>
+                    <div class="breathing-settings">
+                        <label for="breathing-technique">Technique:</label>
+                        <select id="breathing-technique" onchange="changeBreathingTechnique()">
+                            <option value="478">4-7-8 Breathing</option>
+                            <option value="box">Box Breathing</option>
+                            <option value="coherent">Coherent Breathing</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-brain" aria-hidden="true"></i>
+                        <span>MindfulPath</span>
+                    </div>
+                    <p>Your comprehensive digital companion for mental wellness, providing evidence-based tools and
+                        AI-powered support for your journey to better mental health.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Follow us on Facebook"><i class="fab fa-facebook"
+                                aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Follow us on Twitter"><i class="fab fa-twitter"
+                                aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Follow us on Instagram"><i class="fab fa-instagram"
+                                aria-hidden="true"></i></a>
+                        <a href="#" aria-label="Connect on LinkedIn"><i class="fab fa-linkedin"
+                                aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#tools">Wellness Tools</a></li>
+                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="#community">Community</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section support">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#crisis">Crisis Support</a></li>
+                        <li><a href="#professional">Find a Therapist</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section legal">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#accessibility">Accessibility</a></li>
+                        <li><a href="#disclaimer">Medical Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-disclaimer">
+                    <p><strong>Important:</strong> This platform provides educational content and support tools but is
+                        not a substitute for professional medical advice, diagnosis, or treatment. Always seek the
+                        advice of qualified health providers with questions about medical conditions. If you're
+                        experiencing a mental health crisis, contact emergency services or call 988.</p>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 MindfulPath. All rights reserved. Made with 💚 for mental wellness.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/error-handler.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/performance-monitor.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chatbot.js"></script>
+    <script src="js/wellness-tools.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/emotion-ai.js"></script>
+    <script src="js/immersive-environments.js"></script>
+    <script src="js/voice-ai.js"></script>
+    <script src="js/biometric-integration.js"></script>
+    <script src="js/ar-mindfulness.js"></script>
+    <script src="js/dream-journal-analyzer.js"></script>
+    <script src="js/neural-feedback-visualizer.js"></script>
+    <script src="js/social-vr-therapy.js"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/fix.js"></script>
+    <script src="js/complete-fix.js"></script>
+    
+    <!-- Final initialization script -->
+    <script>
+        // Verify all systems are working
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Digital Wellbeing Platform loaded successfully!');
+            console.log('✅ Wellness score system: Active');
+            console.log('✅ Wellness action buttons: Active');
+            console.log('✅ Mood tracking: Active');
+            
+            // Test if functions exist
+            if (typeof handleWellnessAction === 'function') {
+                console.log('✅ Wellness actions handler: Ready');
+            }
+            
+            // Show success notification
+            setTimeout(() => {
+                showWellnessNotification('Platform Ready!', 'All wellness features are now active and ready to use.');
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

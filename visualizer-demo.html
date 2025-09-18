@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Feedback Visualizer Demo</title>
+    
+    <!-- Include required styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/neural-feedback-visualizer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        header h1 {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #38bdf8, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-section {
+            margin-top: 3rem;
+        }
+
+        .wellness-tools {
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Neural Feedback Visualizer</h1>
+            <p>Experience real-time visualization of neural patterns and brain states. This demo simulates brainwave activity, emotions, heart coherence, and mind-body coherence using advanced particle systems.</p>
+        </header>
+        
+        <div class="demo-section">
+            <!-- The visualizer will be automatically injected here -->
+            <div class="wellness-tools"></div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <!-- First add mock dependencies to prevent errors -->
+    <script>
+        // Mock biometric system
+        window.biometricSystem = {
+            isConnected: false,
+            addDataListener: function(type, callback) {
+                console.log("Added mock listener for", type);
+            }
+        };
+        
+        // Mock emotion AI
+        window.emotionAI = {
+            currentEmotion: "neutral"
+        };
+        
+        // Mock notification system
+        window.showNotification = function(message, type) {
+            console.log("Notification:", message, type);
+            // Show a real notification
+            const notif = document.createElement('div');
+            notif.className = 'notification ' + (type || 'info');
+            notif.innerHTML = message;
+            document.body.appendChild(notif);
+            
+            // Style the notification
+            Object.assign(notif.style, {
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                padding: '15px 20px',
+                background: type === 'success' ? '#059669' : '#0284c7',
+                color: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                zIndex: 9999,
+                transition: 'all 0.3s ease'
+            });
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notif.style.opacity = 0;
+                setTimeout(() => {
+                    document.body.removeChild(notif);
+                }, 300);
+            }, 3000);
+        };
+    </script>
+    <script src="js/neural-feedback-visualizer.js"></script>
+    <script src="js/visualizer-demo-helper.js"></script>
+</body>
+</html>

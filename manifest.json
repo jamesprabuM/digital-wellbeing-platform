@@ -1,0 +1,66 @@
+{
+  "name": "MindfulPath - Digital Wellbeing Platform",
+  "short_name": "MindfulPath",
+  "description": "Comprehensive digital mental health platform with AI support, wellness tools, and mood tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "categories": ["health", "medical", "wellness", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg width='192' height='192' viewBox='0 0 192 192' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='192' height='192' rx='24' fill='%23667eea'/%3E%3Cpath d='M96 48C73.9086 48 56 65.9086 56 88C56 110.091 73.9086 128 96 128C118.091 128 136 110.091 136 88C136 65.9086 118.091 48 96 48Z' fill='white' fill-opacity='0.8'/%3E%3Cpath d='M96 72C86.0589 72 78 80.0589 78 90C78 99.9411 86.0589 108 96 108C105.941 108 114 99.9411 114 90C114 80.0589 105.941 72 96 72Z' fill='%23f093fb'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg width='512' height='512' viewBox='0 0 512 512' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='512' height='512' rx='64' fill='%23667eea'/%3E%3Cpath d='M256 128C197.033 128 148 177.033 148 236C148 294.967 197.033 344 256 344C314.967 344 364 294.967 364 236C364 177.033 314.967 128 256 128Z' fill='white' fill-opacity='0.8'/%3E%3Cpath d='M256 192C226.176 192 202 216.176 202 246C202 275.824 226.176 300 256 300C285.824 300 310 275.824 310 246C310 216.176 285.824 192 256 192Z' fill='%23f093fb'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/images/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "assets/images/screenshot-mobile.png", 
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mood Tracker",
+      "short_name": "Mood",
+      "description": "Track your daily mood",
+      "url": "/#dashboard",
+      "icons": [{ "src": "assets/icons/mood-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Breathing Exercise", 
+      "short_name": "Breathe",
+      "description": "Start a breathing exercise",
+      "url": "/#breathing",
+      "icons": [{ "src": "assets/icons/breathe-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Chat Support",
+      "short_name": "Chat", 
+      "description": "Talk to MindBot",
+      "url": "/#chat",
+      "icons": [{ "src": "assets/icons/chat-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
