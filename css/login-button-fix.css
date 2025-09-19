@@ -1,0 +1,68 @@
+/**
+ * Login Button Icon Fix
+ * This stylesheet fixes the visibility of the login button icon in the navbar
+ * and ensures it stays at the end of the navbar with correct alignment
+ */
+
+.nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    margin-left: auto !important; /* Push to the end of the navbar */
+}
+
+/* Fix icon alignment */
+.nav-actions .btn.btn-secondary i.fas.fa-user-circle {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin-right: 8px !important;
+    font-size: 1.1rem !important;
+    color: white !important;
+    vertical-align: middle !important;
+}
+
+/* Style for the Login/Register button */
+.nav-actions .btn.btn-secondary {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    color: white !important;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4) !important;
+    transition: all 0.3s ease !important;
+    margin-left: auto !important; /* Push to the right */
+    height: 48px !important;
+    min-width: 160px !important;
+}
+
+/* Make sure the navbar container has proper layout */
+.nav-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding: 0 1.5rem !important;
+}
+
+.nav-actions .btn.btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5) !important;
+}
+
+/* Ensure proper spacing */
+.nav-actions {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Make sure the icon is visible */
+.nav-actions .btn.btn-secondary i.fas {
+    color: white !important;
+    font-size: 1rem !important;
+    margin-right: 6px !important;
+}

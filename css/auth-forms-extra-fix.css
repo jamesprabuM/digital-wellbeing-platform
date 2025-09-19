@@ -1,0 +1,128 @@
+/**
+ * Additional Auth Form Visibility Fixes
+ * This stylesheet provides aggressive fixes for auth form visibility issues
+ */
+
+.auth-sidebar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 400px !important;
+    align-items: center !important;
+    padding: 2rem 0 !important;
+    background: transparent !important;
+    z-index: 50 !important;
+}
+
+.auth-panel {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+}
+
+.auth-tabs {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+}
+
+.auth-tab {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    padding: 1rem !important;
+    font-weight: 600 !important;
+    color: #4a5568 !important;
+    background: #f7fafc !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.auth-tab.active {
+    color: #667eea !important;
+    background: white !important;
+    border-bottom: 2px solid #667eea !important;
+}
+
+.auth-form-container {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 0 !important;
+    flex-direction: column !important;
+    padding: 2rem !important;
+    width: 100% !important;
+    transition: opacity 0.3s ease !important;
+    position: absolute !important;
+    transform: translateX(-9999px) !important;
+}
+
+.auth-form-container.active {
+    opacity: 1 !important;
+    position: relative !important;
+    transform: translateX(0) !important;
+}
+
+#login-form-container.active,
+#register-form-container.active {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    transform: translateX(0) !important;
+}
+
+/* Ensure form inputs are visible */
+.auth-form input {
+    display: block !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Form buttons */
+.btn-auth {
+    width: 100% !important;
+    padding: 0.75rem !important;
+    margin-top: 1rem !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Error messages */
+.auth-error {
+    display: block !important;
+    color: #e53e3e !important;
+    margin-bottom: 1rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Make sure the hero layout supports the auth sidebar properly */
+.hero-layout {
+    display: flex !important;
+    gap: 3rem !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 0 2rem !important;
+    align-items: stretch !important;
+    min-height: calc(100vh - 80px) !important;
+}
+
+/* Ensure hero content doesn't overlap auth sidebar */
+.hero-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: left !important;
+    max-width: none !important;
+}

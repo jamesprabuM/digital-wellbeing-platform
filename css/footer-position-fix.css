@@ -1,0 +1,51 @@
+/**
+ * Footer Position Fix
+ * Ensures the footer is always at the bottom of the page
+ */
+
+/* Ensure the body takes up at least the full viewport height */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Main content should grow to push footer down */
+main, .main-content {
+    flex: 1 0 auto;
+}
+
+/* Footer should not grow, just stay at the bottom */
+.footer {
+    flex-shrink: 0;
+    margin-top: 2rem; /* Add some spacing above footer */
+    position: relative;
+}
+
+/* Ensure correct spacing when minimal content */
+.container, .container-fluid {
+    padding-bottom: 2rem; /* Add some padding at the bottom of containers */
+}
+
+/* Fix for specific pages with minimal content */
+body.short-content .footer {
+    margin-top: auto;
+}
+
+/* Proper spacing for main content sections */
+section:last-of-type {
+    margin-bottom: 2rem;
+}
+
+/* Handle scrollable content pages */
+html, body {
+    overflow-x: hidden;
+}
+
+@media (max-height: 800px) {
+    /* Adjust spacing for smaller screens */
+    .footer {
+        margin-top: 1rem;
+    }
+}

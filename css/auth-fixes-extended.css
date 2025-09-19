@@ -1,0 +1,306 @@
+/* Authentication Fixes CSS */
+
+/* Form Error Styling */
+.form-error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Auth Error Styling */
+.auth-error {
+    color: #e74c3c;
+    font-size: 14px;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    display: none;
+}
+
+/* Shake Animation for Errors */
+.shake-error {
+    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
+    }
+}
+
+/* Auth Toast Styling */
+.auth-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    max-width: 350px;
+}
+
+.auth-toast.error {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.auth-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.toast-message {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    font-size: 12px;
+    padding: 5px 0;
+    margin-top: 5px;
+}
+
+.password-strength.weak {
+    color: #e74c3c;
+}
+
+.password-strength.strong {
+    color: #2ecc71;
+}
+
+/* Form Validation Styling */
+input.invalid {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 1px #e74c3c !important;
+}
+
+input.valid {
+    border-color: #2ecc71 !important;
+    box-shadow: 0 0 0 1px #2ecc71 !important;
+}
+
+/* Input with Loading State */
+input:disabled,
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Firebase Error Notification Styling */
+.firebase-error-notification,
+.firebase-parse-error-notification,
+.api-error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #fff;
+    border-left: 4px solid #ff6b6b;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 0;
+    z-index: 10000;
+    max-width: 350px;
+    font-family: 'Inter', sans-serif;
+    animation: slide-in 0.3s ease forwards;
+}
+
+@keyframes slide-in {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Offline/Online Notification Styling */
+.offline-notification,
+.online-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    animation: slide-up 0.3s ease forwards;
+    font-family: 'Inter', sans-serif;
+}
+
+.offline-notification {
+    background: #333;
+    color: white;
+}
+
+.online-notification {
+    background: #4CAF50;
+    color: white;
+}
+
+@keyframes slide-up {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Fix for Auth Panel Display */
+.auth-panel {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Auth Form Container Active State */
+.auth-form-container.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Auth Form Container Inactive State */
+.auth-form-container:not(.active) {
+    display: none !important;
+}
+
+/* Auth Tab Active State */
+.auth-tab.active {
+    background-color: #667eea !important;
+    color: white !important;
+}
+
+/* Enhanced Button States */
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-auth {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-auth:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn-auth:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+
+    20% {
+        transform: scale(25, 25);
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(40, 40);
+    }
+}
+
+/* Auth Form Container Improvements */
+.auth-form-container {
+    padding: 20px !important;
+    transition: all 0.3s ease;
+}
+
+/* Auth Sidebar Forcefully Visible */
+#auth-sidebar {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 400px !important;
+    align-items: center !important;
+    padding: 2rem 0 !important;
+    background: transparent !important;
+}
+
+/* Hero Layout with Auth Sidebar */
+.hero-layout {
+    display: flex !important;
+    gap: 3rem !important;
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 0 2rem !important;
+    align-items: stretch !important;
+    min-height: calc(100vh - 80px) !important;
+}
+
+/* Hero Content Adjustments */
+.hero-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: left !important;
+    max-width: none !important;
+}
