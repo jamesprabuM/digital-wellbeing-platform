@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Firebase Login Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+
+        .auth-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #e8f5e9;
+        }
+
+        #logout-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background-color: #f1f1f1;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background-color: #4285F4;
+            color: white;
+            border-color: #4285F4;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Firebase Authentication Test</h1>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="login">Login</div>
+            <div class="tab" data-tab="signup">Sign Up</div>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-tab" class="tab-content active">
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter your password">
+                </div>
+                <button type="submit">Login</button>
+                <p id="login-error" class="error"></p>
+                <p id="login-success" class="success"></p>
+            </form>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div id="signup-tab" class="tab-content">
+            <h2>Sign Up</h2>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" required
+                        placeholder="Create a password (min 6 characters)">
+                </div>
+                <button type="submit">Sign Up</button>
+                <p id="signup-error" class="error"></p>
+                <p id="signup-success" class="success"></p>
+            </form>
+        </div>
+
+        <!-- Auth Status -->
+        <div id="auth-status" class="auth-status" style="display: none;">
+            <h3>Authentication Status</h3>
+            <p id="status-message">Checking authentication...</p>
+            <div id="user-details"></div>
+        </div>
+
+        <!-- Logout -->
+        <div id="logout-container">
+            <button id="logout-button">Logout</button>
+        </div>
+    </div>
+
+    <!-- Firebase Core SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Direct Firebase Fix (with valid API key) -->
+    <script src="js/direct-firebase-fix.js"></script>
+
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Show corresponding tab content
+                const tabId = this.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Make sure Firebase is initialized
+        function waitForFirebase() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 50;
+
+                function checkFirebase() {
+                    if (typeof firebase !== 'undefined' && firebase.app) {
+                        try {
+                            const app = firebase.app();
+                            if (app && app.options && app.options.apiKey) {
+                                console.log('Firebase is ready to use');
+                                resolve(firebase);
+                                return;
+                            }
+                        } catch (e) {
+                            console.log('Firebase not fully initialized yet...');
+                        }
+                    }
+
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        reject(new Error('Firebase initialization timed out after 5 seconds'));
+                        return;
+                    }
+
+                    setTimeout(checkFirebase, 100);
+                }
+
+                checkFirebase();
+            });
+        }
+
+        // Wait for Firebase to be ready
+        waitForFirebase()
+            .then(() => {
+                console.log('Firebase is ready, setting up auth forms');
+                setupAuthForms();
+                checkAuthState();
+            })
+            .catch(error => {
+                console.error('Firebase initialization failed:', error);
+                document.getElementById('login-error').textContent = 'Firebase initialization failed: ' + error.message;
+                document.getElementById('signup-error').textContent = 'Firebase initialization failed: ' + error.message;
+            });
+
+        function setupAuthForms() {
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                // Clear previous messages
+                document.getElementById('login-error').textContent = '';
+                document.getElementById('login-success').textContent = '';
+
+                // Login with Firebase
+                firebase.auth().signInWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        // Success
+                        document.getElementById('login-success').textContent = 'Login successful!';
+                        checkAuthState();
+                    })
+                    .catch(error => {
+                        // Error
+                        document.getElementById('login-error').textContent = error.message;
+                        console.error('Login error:', error);
+                    });
+            });
+
+            // Sign up form
+            document.getElementById('signup-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+
+                // Clear previous messages
+                document.getElementById('signup-error').textContent = '';
+                document.getElementById('signup-success').textContent = '';
+
+                // Create user with Firebase
+                firebase.auth().createUserWithEmailAndPassword(email, password)
+                    .then(userCredential => {
+                        // Update profile with name
+                        return userCredential.user.updateProfile({
+                            displayName: name
+                        }).then(() => {
+                            // Save user data to Firestore if available
+                            if (firebase.firestore) {
+                                try {
+                                    firebase.firestore().collection('users').doc(userCredential.user.uid).set({
+                                        displayName: name,
+                                        email: email,
+                                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                    });
+                                } catch (firestoreError) {
+                                    console.warn('Failed to save user data to Firestore:', firestoreError);
+                                }
+                            }
+
+                            // Success
+                            document.getElementById('signup-success').textContent = 'Account created successfully!';
+                            checkAuthState();
+                        });
+                    })
+                    .catch(error => {
+                        // Error
+                        document.getElementById('signup-error').textContent = error.message;
+                        console.error('Signup error:', error);
+                    });
+            });
+
+            // Logout button
+            document.getElementById('logout-button').addEventListener('click', function () {
+                firebase.auth().signOut()
+                    .then(() => {
+                        console.log('User signed out');
+                        checkAuthState();
+                    })
+                    .catch(error => {
+                        console.error('Error signing out:', error);
+                    });
+            });
+        }
+
+        // Check authentication state
+        function checkAuthState() {
+            const authStatus = document.getElementById('auth-status');
+            const statusMessage = document.getElementById('status-message');
+            const userDetails = document.getElementById('user-details');
+            const logoutContainer = document.getElementById('logout-container');
+
+            firebase.auth().onAuthStateChanged(user => {
+                authStatus.style.display = 'block';
+
+                if (user) {
+                    // User is signed in
+                    statusMessage.textContent = 'User is authenticated';
+                    userDetails.innerHTML = `
+                        <p><strong>User ID:</strong> ${user.uid}</p>
+                        <p><strong>Name:</strong> ${user.displayName || 'Not set'}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Email Verified:</strong> ${user.emailVerified ? 'Yes' : 'No'}</p>
+                    `;
+                    logoutContainer.style.display = 'block';
+
+                    // Get and display ID token
+                    user.getIdToken().then(token => {
+                        const tokenPreview = token.substring(0, 20) + '...';
+                        userDetails.innerHTML += `
+                            <p><strong>ID Token:</strong> ${tokenPreview}</p>
+                        `;
+                    });
+                } else {
+                    // User is signed out
+                    statusMessage.textContent = 'User is not authenticated';
+                    userDetails.textContent = '';
+                    logoutContainer.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

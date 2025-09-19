@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #3ECF8E;
+            border-bottom: 2px solid #3ECF8E;
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .success {
+            color: #43a047;
+        }
+
+        .error {
+            color: #e53935;
+        }
+
+        .info {
+            color: #1976d2;
+        }
+
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #3ECF8E;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #35b67a;
+        }
+
+        .actions {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Supabase Connection Test</h1>
+
+    <div class="card">
+        <div class="status">Connection Status: <span id="connection-status">Checking...</span></div>
+        <div id="connection-details"></div>
+    </div>
+
+    <div class="actions">
+        <button id="test-connection">Test Connection</button>
+        <button id="test-auth">Test Authentication</button>
+    </div>
+
+    <div class="card">
+        <h3>Configuration Details</h3>
+        <pre id="config-details">Loading configuration...</pre>
+    </div>
+
+    <div class="card">
+        <h3>Response Data</h3>
+        <pre id="response-data">No data yet. Click "Test Connection" to fetch data.</pre>
+    </div>
+
+    <!-- Supabase Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Our Supabase client -->
+    <script src="js/supabase-client.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if Supabase is available
+            if (typeof window.supabase === 'undefined') {
+                document.getElementById('connection-status').textContent = 'Error: Supabase client not loaded';
+                document.getElementById('connection-status').className = 'error';
+                document.getElementById('connection-details').innerHTML = 'Could not find the Supabase client. Make sure js/supabase-client.js is loaded properly.';
+                return;
+            }
+
+            // Display configuration details
+            const client = window.supabase.getClient();
+            if (!client) {
+                document.getElementById('config-details').textContent = 'Error: Could not initialize Supabase client';
+                return;
+            }
+
+            // Show configuration (masked key for security)
+            document.getElementById('config-details').textContent =
+                `Supabase URL: ${client.supabaseUrl}\n` +
+                `Supabase Key: ${maskApiKey(client.supabaseKey)}\n` +
+                `Is Configured: ${window.supabase.isConfigured() ? 'Yes' : 'No'}`;
+
+            // Set up test connection button
+            document.getElementById('test-connection').addEventListener('click', testConnection);
+
+            // Set up test auth button
+            document.getElementById('test-auth').addEventListener('click', testAuthentication);
+
+            // Run initial connection test
+            testConnection();
+        });
+
+        // Test Supabase Connection
+        async function testConnection() {
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionDetails = document.getElementById('connection-details');
+            const responseData = document.getElementById('response-data');
+
+            connectionStatus.textContent = 'Testing...';
+            connectionStatus.className = 'info';
+
+            try {
+                // Get the Supabase client
+                const client = window.supabase.getClient();
+
+                // Test connection by making a simple request
+                const start = Date.now();
+                const { data, error } = await client.from('_dummy_query').select('*').limit(1).catch(err => {
+                    // This is expected to fail if the table doesn't exist
+                    // We're just testing if we can reach Supabase
+                    return { data: null, error: err };
+                });
+                const end = Date.now();
+
+                // Check if we could connect (even if the query failed due to missing table)
+                if (error && error.code === 'PGRST116') {
+                    // This error means "relation does not exist" which is expected
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'success';
+                    connectionDetails.innerHTML = `
+                        <p>Successfully connected to Supabase! (${end - start}ms)</p>
+                        <p>The test query failed as expected because we queried a non-existent table.</p>
+                        <p>This confirms that we can reach the Supabase API with your credentials.</p>
+                    `;
+                    responseData.textContent = JSON.stringify(error, null, 2);
+                }
+                else if (error) {
+                    // Real error with the connection
+                    connectionStatus.textContent = 'Error';
+                    connectionStatus.className = 'error';
+                    connectionDetails.innerHTML = `<p>Error connecting to Supabase: ${error.message}</p>`;
+                    responseData.textContent = JSON.stringify(error, null, 2);
+                }
+                else {
+                    // Somehow the query worked - maybe the table exists!
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'success';
+                    connectionDetails.innerHTML = `
+                        <p>Successfully connected to Supabase! (${end - start}ms)</p>
+                        <p>Unexpectedly found a table that we queried. This is fine!</p>
+                    `;
+                    responseData.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                connectionStatus.textContent = 'Error';
+                connectionStatus.className = 'error';
+                connectionDetails.innerHTML = `<p>Exception while connecting to Supabase: ${error.message}</p>`;
+                responseData.textContent = JSON.stringify(error, null, 2);
+            }
+        }
+
+        // Test Authentication
+        async function testAuthentication() {
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionDetails = document.getElementById('connection-details');
+            const responseData = document.getElementById('response-data');
+
+            connectionStatus.textContent = 'Checking Authentication...';
+            connectionStatus.className = 'info';
+
+            try {
+                // Get the Supabase client
+                const client = window.supabase.getClient();
+
+                // Check if already authenticated
+                const { data: sessionData } = await client.auth.getSession();
+
+                if (sessionData && sessionData.session) {
+                    // Already authenticated
+                    connectionStatus.textContent = 'Authenticated';
+                    connectionStatus.className = 'success';
+                    connectionDetails.innerHTML = `
+                        <p>User is already authenticated!</p>
+                        <p>User ID: ${sessionData.session.user.id}</p>
+                        <p>Email: ${sessionData.session.user.email || 'Not available'}</p>
+                        <button id="logout-btn">Logout</button>
+                    `;
+
+                    // Add logout handler
+                    document.getElementById('logout-btn').addEventListener('click', async () => {
+                        const { error } = await client.auth.signOut();
+                        if (error) {
+                            alert('Error logging out: ' + error.message);
+                        } else {
+                            alert('Logged out successfully');
+                            testAuthentication();
+                        }
+                    });
+
+                    responseData.textContent = JSON.stringify(sessionData.session, null, 2);
+                } else {
+                    // Not authenticated - show sign-in form
+                    connectionStatus.textContent = 'Not Authenticated';
+                    connectionDetails.innerHTML = `
+                        <p>User is not authenticated. Try signing in:</p>
+                        <form id="signin-form" style="margin-top: 15px;">
+                            <div style="margin-bottom: 10px;">
+                                <input type="email" id="email" placeholder="Email" required style="padding: 8px; width: 200px;">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <input type="password" id="password" placeholder="Password" required style="padding: 8px; width: 200px;">
+                            </div>
+                            <div>
+                                <button type="submit" style="background-color: #3ECF8E; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Sign In</button>
+                                <button type="button" id="signup-btn" style="background-color: #f1f1f1; color: #333; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Sign Up</button>
+                            </div>
+                        </form>
+                    `;
+
+                    // Add sign-in handler
+                    document.getElementById('signin-form').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const email = document.getElementById('email').value;
+                        const password = document.getElementById('password').value;
+
+                        connectionStatus.textContent = 'Signing In...';
+
+                        const { data, error } = await window.supabase.auth.signIn(email, password);
+
+                        if (error) {
+                            connectionStatus.textContent = 'Authentication Failed';
+                            connectionStatus.className = 'error';
+                            connectionDetails.innerHTML += `<p style="color: red; margin-top: 10px;">Error: ${error.message}</p>`;
+                            responseData.textContent = JSON.stringify(error, null, 2);
+                        } else {
+                            connectionStatus.textContent = 'Authenticated';
+                            connectionStatus.className = 'success';
+                            testAuthentication();
+                        }
+                    });
+
+                    // Add sign-up handler
+                    document.getElementById('signup-btn').addEventListener('click', async () => {
+                        const email = document.getElementById('email').value;
+                        const password = document.getElementById('password').value;
+
+                        if (!email || !password) {
+                            alert('Please enter both email and password');
+                            return;
+                        }
+
+                        connectionStatus.textContent = 'Signing Up...';
+
+                        const { data, error } = await window.supabase.auth.signUp(email, password);
+
+                        if (error) {
+                            connectionStatus.textContent = 'Sign Up Failed';
+                            connectionStatus.className = 'error';
+                            connectionDetails.innerHTML += `<p style="color: red; margin-top: 10px;">Error: ${error.message}</p>`;
+                            responseData.textContent = JSON.stringify(error, null, 2);
+                        } else {
+                            connectionStatus.textContent = 'Signed Up';
+                            connectionStatus.className = 'success';
+                            connectionDetails.innerHTML += `<p style="color: green; margin-top: 10px;">Success! Check your email for confirmation.</p>`;
+                            responseData.textContent = JSON.stringify(data, null, 2);
+                        }
+                    });
+
+                    responseData.textContent = 'No active session found';
+                }
+
+            } catch (error) {
+                connectionStatus.textContent = 'Error';
+                connectionStatus.className = 'error';
+                connectionDetails.innerHTML = `<p>Error checking authentication: ${error.message}</p>`;
+                responseData.textContent = JSON.stringify(error, null, 2);
+            }
+        }
+
+        // Helper function to mask API key for display
+        function maskApiKey(key) {
+            if (!key) return '';
+            if (key.length < 8) return '****';
+            return key.substring(0, 4) + '...' + key.substring(key.length - 4);
+        }
+    </script>
+</body>
+
+</html>

@@ -59,9 +59,12 @@ A comprehensive digital mental health platform offering mood tracking, wellness 
 ## Technology Stack
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Backend**: Node.js with Express
+- **Authentication**: Supabase Authentication (migrated from Firebase)
+- **Database**: Supabase (PostgreSQL) and MongoDB
 - **Design**: CSS Grid, Flexbox, CSS Custom Properties
 - **Animations**: CSS Animations, Canvas API
-- **Storage**: Local Storage for privacy
+- **Storage**: Supabase Storage and Local Storage
 - **Accessibility**: WCAG 2.1 AA compliant
 
 ## Key Wellness Components
@@ -98,7 +101,10 @@ Comprehensive sleep tracking with:
 
 ## Privacy & Security
 
-- All data stored locally on your device
+- User data stored securely in Supabase with row-level security
+- JWT authentication for secure API access
+- Encrypted user credentials with Supabase Auth
+- Optional local storage for offline capabilities
 - No personal information shared with third parties
 - Anonymous usage analytics only
 - HIPAA-compliant design principles
@@ -131,7 +137,204 @@ All wellness tools and content are based on:
 
 ## Getting Started
 
-1. Open the platform in your web browser
+### Installation and Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/digital-wellbeing-platform.git
+   cd digital-wellbeing-platform
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+   Create a `.env` file in the root directory with:
+   ```
+   PORT=4000
+   MONGODB_URI=mongodb://localhost:27017/mindful-path
+   JWT_SECRET=your-secret-key-change-in-production
+   SUPABASE_URL=https://uatbksfpmbrqntbfxxkn.supabase.co
+   SUPABASE_SERVICE_KEY=your-supabase-service-key
+   ```
+
+4. Configure Supabase:
+   - Create a project at [supabase.com](https://supabase.com) if you don't have one
+   - Update the configuration in `js/supabase-config.js`
+   - Note: Currently the app uses sample credentials for demonstration purposes
+
+5. Start the server:
+   ```bash
+   npm start
+   ```
+   This will start the server on port 4000 using the server-supabase.js file
+
+6. Access the application:
+   Open your browser and navigate to `http://localhost:4000`
+
+### Recent Updates
+
+1. **Fixed Authentication System**:
+   - Fixed issues with login and registration forms
+   - Properly hiding register form after login
+   - Improved form button styling and positioning
+
+2. **Layout Improvements**:
+   - Fixed footer positioning to always stay at the bottom of the page
+   - Added responsive design improvements for various screen sizes
+   - Enhanced user interface with better form validation and feedback
+
+3. **User Experience Enhancements**:
+   - Improved form interactions with subtle animations
+   - Better visual feedback for form submissions
+   - More intuitive authentication flow
+
+### Troubleshooting
+
+If you encounter any issues:
+
+1. **Server won't start**:
+   - Check if another process is using port 4000
+   - Verify all dependencies are installed with `npm install`
+   - Check for errors in the server console
+   - Make sure .env file exists with the required configuration
+
+### Development Todo List
+
+1. **Authentication Fixes**:
+   - ✅ Fix login and registration form issues
+   - ✅ Hide register form after login
+   - ✅ Fix footer positioning
+   - 🔄 Fix Supabase authentication configuration (Currently using sample credentials)
+
+2. **UI Improvements**:
+   - ✅ Enhance submit button styling
+   - ✅ Improve form weight and visual appearance
+   - ✅ Fix footer layout
+   - ✅ Update footer content
+
+3. **Future Enhancements**:
+   - Implement proper error handling for authentication failures
+   - Add form validation with better error messages
+   - Enhance mobile responsiveness
+   - Implement offline mode capabilities
+
+2. **Authentication issues**:
+   - Clear browser cache and local storage
+   - Check Supabase configuration in js/supabase-config.js
+   - Review browser console for JavaScript errors
+
+3. **Layout problems**:
+   - Try different browsers to isolate browser-specific issues
+   - Check if all CSS files are properly loading
+   - Verify that footer-position-fix.css is included
+
+### Code Structure
+
+```
+digital-wellbeing-platform/
+│
+├── assets/            # Static assets like images
+│
+├── css/               # All styling files
+│   ├── styles.css     # Main stylesheet
+│   ├── auth.css       # Authentication styling
+│   ├── footer-position-fix.css  # Footer positioning fix
+│   └── ...            # Various component-specific styles
+│
+├── js/                # JavaScript files
+│   ├── app.js         # Main application logic
+│   ├── supabase-config.js  # Supabase configuration
+│   ├── auth-form-fixes-post-login.js  # Auth form fixes
+│   └── ...            # Component and feature scripts
+│
+├── server-supabase.js # Main server file
+├── package.json       # Project dependencies
+└── README.md          # Project documentation
+```
+
+### Key Files
+
+1. **Server**: 
+   - `server-supabase.js` - Main server file that starts the application
+
+2. **Authentication**:
+   - `js/supabase-config.js` - Supabase configuration
+   - `js/supabase-auth.js` - Authentication logic
+   - `js/auth-form-fixes-post-login.js` - Fixes for auth forms after login
+
+3. **Styling**:
+   - `css/styles.css` - Main stylesheet
+   - `css/footer-position-fix.css` - Footer positioning fix
+   - `css/auth.css` - Authentication form styling
+
+### Step-by-Step Usage Guide
+
+1. **Start the Server**:
+   ```bash
+   npm start
+   ```
+   This will launch the server on port 4000.
+
+2. **Access the Platform**:
+   Open your browser and navigate to `http://localhost:4000`.
+
+3. **Register a New Account**:
+   - Click on the "Login" button in the top navigation
+   - Click on the "Register" tab
+   - Fill out the registration form with your details
+   - Accept the Terms of Service
+   - Click "Create Account"
+
+4. **Login to Your Account**:
+   - Click on the "Login" button in the top navigation
+   - Enter your email and password
+   - Click "Sign In"
+
+5. **Using the Dashboard**:
+   - After logging in, you'll be redirected to your personal dashboard
+   - Track your mood, sleep, and other wellness metrics
+   - Access meditation tools and wellness assessments
+   - Chat with the AI companion for mental health support
+
+6. **Wellness Tools**:
+   - Access guided breathing exercises
+   - Use the meditation timer
+   - Track thoughts with the CBT thought tracker
+   - Practice gratitude with the gratitude journal
+
+### API Endpoints
+
+The platform provides several API endpoints for managing wellness data:
+
+1. **Authentication**:
+   - `/api/auth/*` - Supabase authentication endpoints
+
+2. **User Profile**:
+   - `GET /api/user/profile` - Get user profile information
+   - `PUT /api/user/profile` - Update user profile information
+
+3. **Wellness Data**:
+   - `GET /api/wellness/data` - Get all wellness data for the user
+   - `POST /api/wellness/data` - Add new wellness data
+
+4. **Specific Wellness Endpoints**:
+   - `POST /api/wellness/mood` - Record mood
+   - `POST /api/wellness/sleep` - Log sleep data
+   - `POST /api/wellness/exercise` - Log exercise activity
+   - `POST /api/wellness/mindfulness` - Log mindfulness practice
+   - `POST /api/wellness/journal` - Create journal entry
+   - `GET /api/wellness/journal` - Get journal entries
+   - `POST /api/wellness/goals` - Create new goals
+   - `GET /api/wellness/goals` - Get user goals
+
+All API endpoints require authentication with a valid Supabase token.
+
+### User Guide
+
+1. Sign up or log in using Supabase authentication
 2. Start with the mood tracker to establish baseline data
 3. Explore wellness tools based on your current needs
 4. Chat with MindBot for personalized support
