@@ -15,9 +15,9 @@ Before you begin, make sure you have the following installed on your system:
    - Download from: https://git-scm.com/
    - Verify installation: `git --version`
 
-3. **MongoDB** (optional - for local database)
-   - Download from: https://www.mongodb.com/try/download/community
-   - Alternative: Use MongoDB Atlas (cloud database)
+3. **Supabase Account** (for database and authentication)
+   - Create a free account at: https://supabase.com
+   - No local database installation required
 
 4. **A modern web browser** (Chrome, Firefox, Safari, or Edge)
 
@@ -49,48 +49,57 @@ npm install
 
 **Expected output:** You should see packages being downloaded and installed. This may take a few minutes.
 
-### Step 3: Database Setup (Choose One Option)
+### Step 3: Supabase Setup
 
-#### Option A: Local MongoDB (Recommended for development)
-1. Install MongoDB Community Edition from https://www.mongodb.com/try/download/community
-2. Start MongoDB service:
-   - **Windows**: MongoDB should start automatically after installation
-   - **macOS**: `brew services start mongodb/brew/mongodb-community`
-   - **Linux**: `sudo systemctl start mongod`
+1. **Create a Supabase Account**:
+   - Go to https://supabase.com and sign up for a free account
+   - Create a new project
+   - Choose a database password when prompted
 
-#### Option B: MongoDB Atlas (Cloud Database)
-1. Create a free account at https://www.mongodb.com/atlas
-2. Create a new cluster
-3. Get your connection string
-4. Replace the `MONGODB_URI` in Step 4 with your Atlas connection string
+2. **Get Your Supabase Credentials**:
+   - In your Supabase dashboard, go to **Settings** → **API**
+   - Copy your **Project URL** (looks like: `https://xxxxx.supabase.co`)
+   - Copy your **Service Role Key** (anon public key for client-side, service_role for server-side)
+   - **Important**: Use the `service_role` key for the server setup
+
+3. **Database Tables** (Optional):
+   - Supabase will automatically create tables as needed
+   - The application will handle table creation through the API
 
 ### Step 4: Environment Configuration
 
 Create a `.env` file in the root directory of your project:
 
 ```bash
-# Create .env file
-touch .env  # On Windows, you can create this file in your text editor
+# Create .env file from the example template
+cp .env.example .env  # On Windows: copy .env.example .env
 ```
 
-Add the following content to your `.env` file:
+Or create it manually and add the following content to your `.env` file:
 
 ```env
 # Server Configuration
-PORT=3001
+PORT=4000
 
-# Database Configuration
-MONGODB_URI=mongodb://localhost:27017/mindful-path
+# Supabase Configuration (Required)
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key-here
 
-# Security Configuration
+# Optional: Additional Security
 JWT_SECRET=your-super-secure-secret-key-change-this-in-production
-
-# Optional: Supabase Configuration (for advanced features)
-SUPABASE_URL=your-supabase-url
-SUPABASE_SERVICE_KEY=your-supabase-service-key
 ```
 
-**Important:** Change `your-super-secure-secret-key-change-this-in-production` to a strong, random string for security.
+**Important:** Replace the placeholder values with your actual Supabase credentials:
+
+- Replace `https://your-project-id.supabase.co` with your actual Supabase URL
+- Replace `your-service-role-key-here` with your actual service role key
+- Change `your-super-secure-secret-key-change-this-in-production` to a strong, random string for security
+
+**To get your Supabase credentials:**
+1. Log into your Supabase dashboard
+2. Select your project
+3. Go to **Settings** → **API**
+4. Copy the **URL** and **service_role** key (NOT the anon key for server setup)
 
 ### Step 5: Start the Application
 
@@ -103,15 +112,15 @@ npm start
 
 **Expected output:**
 ```
-Server running on port 3001
-Connected to MongoDB
+🔑 Using Supabase for authentication and data storage
+Server running on port 4000
 ```
 
 ### Step 6: Access the Application
 
 Open your web browser and navigate to:
 ```
-http://localhost:3001
+http://localhost:4000
 ```
 
 You should see the MindfulPath Digital Wellbeing Platform homepage!
@@ -120,7 +129,7 @@ You should see the MindfulPath Digital Wellbeing Platform homepage!
 
 To verify everything is working:
 
-1. **Homepage Test**: Visit `http://localhost:3001` - you should see the platform interface
+1. **Homepage Test**: Visit `http://localhost:4000` - you should see the platform interface
 2. **Registration Test**: Click "Login" → "Register" and create a test account
 3. **Login Test**: Log in with your test account
 4. **Dashboard Test**: After login, you should see your personal wellness dashboard
@@ -128,29 +137,30 @@ To verify everything is working:
 ## 🔧 Troubleshooting Common Issues
 
 ### Issue 1: Port Already in Use
-**Error:** `EADDRINUSE: address already in use :::3001`
+**Error:** `EADDRINUSE: address already in use :::4000`
 
 **Solution:**
 ```bash
 # Option A: Use a different port
-# Edit your .env file and change PORT=3001 to PORT=3002
+# Edit your .env file and change PORT=4000 to PORT=4001
 
 # Option B: Kill the process using the port
 # Windows:
-netstat -ano | findstr :3001
+netstat -ano | findstr :4000
 taskkill /PID <PID_NUMBER> /F
 
 # macOS/Linux:
-lsof -ti:3001 | xargs kill -9
+lsof -ti:4000 | xargs kill -9
 ```
 
-### Issue 2: MongoDB Connection Error
-**Error:** `MongoDB connection error`
+### Issue 2: Supabase Connection Error
+**Error:** `Missing required environment variables: SUPABASE_URL and/or SUPABASE_SERVICE_KEY`
 
 **Solutions:**
-- Ensure MongoDB is running on your system
-- Check if the `MONGODB_URI` in your `.env` file is correct
-- For MongoDB Atlas, verify your connection string and IP whitelist
+- Verify your `.env` file contains the correct `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+- Check that your Supabase project is active and the credentials are correct
+- Ensure you're using the `service_role` key, not the `anon` key for server setup
+- Verify your Supabase project URL format: `https://xxxxx.supabase.co`
 
 ### Issue 3: Missing Dependencies
 **Error:** `Cannot find module 'express'` or similar
@@ -172,6 +182,15 @@ npm install
 # macOS/Linux: Use sudo for npm install if needed
 sudo npm install
 ```
+
+### Issue 5: Missing Environment Variables
+**Error:** `Missing required environment variables: SUPABASE_URL and/or SUPABASE_SERVICE_KEY`
+
+**Solution:**
+- Ensure your `.env` file exists in the root directory
+- Verify that `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` are set correctly
+- Make sure there are no extra spaces or quotes around the values
+- Restart the server after updating the `.env` file
 
 ## 📂 Project Structure Overview
 
@@ -233,7 +252,7 @@ To access the application from other devices on your network:
 
 2. Access from other devices using:
    ```
-   http://YOUR_IP_ADDRESS:3001
+   http://YOUR_IP_ADDRESS:4000
    ```
 
 ## 🔄 Updating the Application

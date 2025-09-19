@@ -2,9 +2,9 @@
 
 // Environment configuration
 const SUPABASE_CONFIG = {
-    // Replace these with your actual Supabase project credentials
-    url: process.env.SUPABASE_URL || 'https://qjvlnqjxqxqxqxqxqxqx.supabase.co',
-    anonKey: process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqdmxucWp4cXhxeHF4cXhxeHF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2NzI4MDAsImV4cCI6MjA1MTI0ODgwMH0.example-key',
+    // Your actual Supabase project credentials (frontend: use anon/public key only)
+    url: 'https://uatbksfpmbrqntbfxxkn.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhdGJrc2ZwbWJycW50YmZ4eGtuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyMTUyMjMsImV4cCI6MjA3Mzc5MTIyM30.HNePrfZz8wU-EH_8O-Ewsj_sD7rxZfqAPbdUYhciELQ',
     
     // Database table names
     tables: {
@@ -157,9 +157,21 @@ window.SUPABASE_CONFIG = SUPABASE_CONFIG;
 window.getSupabaseClient = () => supabaseClient || initializeSupabase();
 
 // Auto-initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+
+// Wait for DOM and Supabase CDN to be ready before initializing
+function tryInitializeSupabaseWhenReady() {
+    if (typeof window.supabase === 'undefined') {
+        console.error('❌ Supabase CDN not loaded! Please check your <script src> order in index.html.');
+        return;
+    }
     initializeSupabase();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInitializeSupabaseWhenReady);
+} else {
+    tryInitializeSupabaseWhenReady();
+}
 
 console.log('📊 Supabase Configuration Loaded');
 console.log('🔧 To set up your database, run the SQL schema in your Supabase dashboard');

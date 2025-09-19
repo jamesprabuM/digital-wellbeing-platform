@@ -12,11 +12,11 @@
     <meta name="description"
         content="Comprehensive digital mental health platform offering mood tracking, wellness assessments, meditation tools, and 24/7 AI support for your mental wellbeing journey.">
         
-    <!-- Core Fix Scripts - Must be loaded first -->
-    <script src="js/api-integration.js"></script>
-    <script src="js/initialization-fix.js"></script>
-    <script src="js/auth-system-fix.js"></script>
-    <script src="js/mongodb-fix.js"></script>
+
+    <!-- Supabase CDN (must be loaded before your scripts) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase config must be loaded before any script that uses Supabase -->
+    <script src="js/supabase-config.js"></script>
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -42,6 +42,8 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+    <!-- Supabase config must be loaded before any script that uses Supabase -->
+    <script src="js/supabase-config.js"></script>
 
 <body>
     <!-- Accessibility Skip Link -->
@@ -67,37 +69,7 @@
                 <li role="none"><a href="#community" role="menuitem">Community</a></li>
                 <li role="none"><a href="#support" role="menuitem">Crisis Support</a></li>
             </ul>
-            <div class="nav-actions">
-                <button id="login-button" class="btn btn-secondary" onclick="window.authManager.openAuthModal()">
-                    <i class="fas fa-user"></i>
-                    Login / Register
-                </button>
-                <div id="user-menu" class="user-menu hidden">
-                    <div class="user-avatar" onclick="window.authManager.toggleUserDropdown()">
-                        <span id="user-initials"></span>
-                    </div>
-                    <div class="user-dropdown" id="user-dropdown">
-                        <div class="user-dropdown-header">
-                            <div class="user-dropdown-name" id="user-dropdown-name"></div>
-                            <div class="user-dropdown-email" id="user-dropdown-email"></div>
-                        </div>
-                        <div class="user-dropdown-menu">
-                            <a href="#" class="user-dropdown-item" onclick="window.authManager.navigateToProfile()">
-                                <i class="fas fa-user-circle"></i>
-                                Profile
-                            </a>
-                            <a href="#" class="user-dropdown-item" onclick="window.authManager.navigateToSettings()">
-                                <i class="fas fa-cog"></i>
-                                Settings
-                            </a>
-                            <a href="#" class="user-dropdown-item" onclick="window.authManager.logout()">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Authentication actions removed: login/register button and user menu -->
         </div>
     </nav>
 
@@ -152,151 +124,27 @@
                     </div>
                 </div>
 
-                <!-- Inline Authentication Panel -->
-                <div class="auth-sidebar" id="auth-sidebar"
-                    style="display: flex !important; visibility: visible !important; flex: 0 0 400px !important; align-items: center !important; padding: 2rem 0 !important;">
-                    <div class="auth-panel" id="auth-panel"
-                        style="width: 100%; background: rgba(255, 255, 255, 0.95) !important; border-radius: 16px; padding: 2rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px);">
-                        <div class="auth-tabs">
-                            <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')">
-                                <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
-                                Login
-                            </button>
-                            <button class="auth-tab" data-tab="register" onclick="switchAuthTab('register')">
-                                <i class="fas fa-user-plus" aria-hidden="true"></i>
-                                Register
-                            </button>
-                        </div>
-
-                        <!-- Login Form -->
-                        <div class="auth-form-container active" id="login-form-container">
-                            <h3 class="auth-title">Welcome Back</h3>
-                            <p class="auth-subtitle">Continue your wellness journey</p>
-                            <div id="login-error" class="auth-error" style="display: none;"></div>
-                            <form id="inline-login-form" class="auth-form">
-                                <div class="form-group">
-                                    <label for="inline-login-email">Email Address</label>
-                                    <input type="email" id="inline-login-email" name="email" required
-                                        placeholder="Enter your email address">
+                                <!-- User Info Modal: Name, Phone, DOB -->
+                                <div id="user-info-modal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); align-items:center; justify-content:center;">
+                                    <div class="modal-content" style="background:#fff; border-radius:12px; max-width:400px; margin:auto; padding:2rem; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                                        <h3 style="margin-top:0;">Welcome! Please enter your details</h3>
+                                        <form id="user-info-form">
+                                            <div class="form-group" style="margin-bottom:1rem;">
+                                                <label for="user-name">Full Name</label>
+                                                <input type="text" id="user-name" name="name" required placeholder="Enter your name" style="width:100%;padding:8px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom:1rem;">
+                                                <label for="user-phone">Phone Number</label>
+                                                <input type="tel" id="user-phone" name="phone" required pattern="[0-9]{10,15}" placeholder="Enter your phone number" style="width:100%;padding:8px;">
+                                            </div>
+                                            <div class="form-group" style="margin-bottom:1rem;">
+                                                <label for="user-dob">Date of Birth</label>
+                                                <input type="date" id="user-dob" name="dob" required style="width:100%;padding:8px;">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem;">Continue</button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="inline-login-password">Password</label>
-                                    <input type="password" id="inline-login-password" name="password" required
-                                        placeholder="Enter your password">
-                                </div>
-                                <div class="form-options">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="inline-remember-me" name="remember">
-                                        <span class="checkmark"></span>
-                                        Remember me
-                                    </label>
-                                    <a href="#" class="forgot-password" onclick="showForgotPassword(event)">
-                                        Forgot password?
-                                    </a>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-auth">
-                                    <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
-                                    Sign In
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Register Form -->
-                        <div class="auth-form-container" id="register-form-container">
-                            <h3 class="auth-title">Join MindfulPath</h3>
-                            <p class="auth-subtitle">Start your wellness journey today</p>
-                            <div id="register-error" class="auth-error" style="display: none;"></div>
-                            <form id="inline-register-form" class="auth-form">
-                                <div class="form-group">
-                                    <label for="inline-register-name">Full Name</label>
-                                    <input type="text" id="inline-register-name" name="name" required
-                                        placeholder="Enter your full name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inline-register-email">Email Address</label>
-                                    <input type="email" id="inline-register-email" name="email" required
-                                        placeholder="Enter your email address">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inline-register-password">Password</label>
-                                    <input type="password" id="inline-register-password" name="password" required
-                                        placeholder="Create a secure password">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inline-register-confirm">Confirm Password</label>
-                                    <input type="password" id="inline-register-confirm" name="confirmPassword" required
-                                        placeholder="Confirm your password">
-                                </div>
-                                <div class="form-options">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="inline-terms" name="terms" required>
-                                        <span class="checkmark"></span>
-                                        I agree to the <a href="#" class="terms-link">Terms of Service</a>
-                                    </label>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-auth">
-                                    <i class="fas fa-user-plus" aria-hidden="true"></i>
-                                    Create Account
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <script>
-                    // FORCE AUTH SIDEBAR TO BE VISIBLE - AGGRESSIVE APPROACH
-                    (function () {
-                        function forceAuthSidebar() {
-                            const sidebar = document.getElementById('auth-sidebar');
-                            const heroLayout = document.querySelector('.hero-layout');
-                            const heroContent = document.querySelector('.hero-content');
-
-                            if (sidebar) {
-                                sidebar.style.cssText = `
-                                display: flex !important;
-                                visibility: visible !important;
-                                opacity: 1 !important;
-                                flex: 0 0 400px !important;
-                                align-items: center !important;
-                                padding: 2rem 0 !important;
-                                background: transparent !important;
-                            `;
-                            }
-
-                            if (heroLayout) {
-                                heroLayout.style.cssText = `
-                                display: flex !important;
-                                gap: 3rem !important;
-                                max-width: 1400px !important;
-                                margin: 0 auto !important;
-                                padding: 0 2rem !important;
-                                align-items: stretch !important;
-                                min-height: calc(100vh - 80px) !important;
-                            `;
-                            }
-
-                            if (heroContent) {
-                                heroContent.style.cssText = `
-                                flex: 1 !important;
-                                display: flex !important;
-                                flex-direction: column !important;
-                                justify-content: center !important;
-                                text-align: left !important;
-                                max-width: none !important;
-                            `;
-                            }
-
-                            console.log('✅ Auth sidebar forced to be visible');
-                        }
-
-                        // Run immediately and after DOM load
-                        forceAuthSidebar();
-                        if (document.readyState === 'loading') {
-                            document.addEventListener('DOMContentLoaded', forceAuthSidebar);
-                        }
-                        setTimeout(forceAuthSidebar, 500);
-                        setTimeout(forceAuthSidebar, 1000);
-                    })();
-                </script>
             </div>
         </section>
 
@@ -1191,8 +1039,55 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
+        <!-- User Info Modal Script -->
+        <script>
+            function showUserInfoModal() {
+                document.getElementById('user-info-modal').style.display = 'flex';
+            }
+            function hideUserInfoModal() {
+                document.getElementById('user-info-modal').style.display = 'none';
+            }
+            function getUserInfo() {
+                try {
+                    return JSON.parse(localStorage.getItem('userInfo'));
+                } catch { return null; }
+            }
+            function setUserInfo(info) {
+                localStorage.setItem('userInfo', JSON.stringify(info));
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                var info = getUserInfo();
+                if (!info || !info.phone || !info.name || !info.dob) {
+                    showUserInfoModal();
+                }
+                var form = document.getElementById('user-info-form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        var name = document.getElementById('user-name').value.trim();
+                        var phone = document.getElementById('user-phone').value.trim();
+                        var dob = document.getElementById('user-dob').value;
+                        if (!name || !phone || !dob) {
+                            alert('Please fill all fields.');
+                            return;
+                        }
+                        if (!/^\d{10,15}$/.test(phone)) {
+                            alert('Please enter a valid phone number (10-15 digits).');
+                            return;
+                        }
+                        setUserInfo({ name, phone, dob });
+                        hideUserInfoModal();
+                        location.reload();
+                    });
+                }
+            });
+        </script>
+        <!-- Scripts -->
     <script src="js/error-handler.js"></script>
+    <script src="js/api-integration.js"></script>
+    <script src="js/initialization-fix.js"></script>
+    <script src="js/auth-system-fix.js"></script>
+    <script src="js/mongodb-fix.js"></script>
     <script src="js/validation.js"></script>
     <script src="js/performance-monitor.js"></script>
     <script src="js/app.js"></script>

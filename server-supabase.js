@@ -1,12 +1,11 @@
 // ===== BACKEND SERVER FOR DIGITAL WELLBEING PLATFORM =====
-// Using Supabase for authentication and data storage
+// Using Supabase for data storage only (no authentication)
 
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
-const supabaseAuthRoutes = require('./routes/supabase-auth');
 
 // Initialize express app
 const app = express();
@@ -34,74 +33,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 
-// Use Supabase auth routes
-app.use('/api/auth', supabaseAuthRoutes);
 
-// Middleware to check if user is authenticated with Supabase
-const authenticateSupabaseToken = async (req, res, next) => {
-    try {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ 
-                message: 'Authentication required',
-                details: 'No bearer token provided'
-            });
-        }
-
-        const token = authHeader.split(' ')[1];
-        
-        // Verify the token with Supabase
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-
-        if (error) {
-            console.error('Token verification error:', error);
-            return res.status(403).json({ 
-                message: 'Invalid or expired token',
-                details: error.message 
-            });
-        }
-
-        if (!user) {
-            return res.status(403).json({ 
-                message: 'Invalid token',
-                details: 'No user associated with token'
-            });
-        }
-
-        // Store user data in request for use in routes
-        req.user = user;
-        req.token = token;  // Store token for potential use in supabase client calls
-
-        // Log successful authentication
-        console.log(`🔐 Authenticated user: ${user.email}`);
-        
-        next();
-    } catch (error) {
-        console.error('Authentication error:', error);
-        return res.status(500).json({ 
-            message: 'Authentication failed',
-            details: error.message
-        });
-    }
-};
+// Authentication middleware removed. All endpoints now use 'name' as the user identifier.
 
 // Routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Auth status endpoint for debugging
-app.get('/api/auth/status', authenticateSupabaseToken, (req, res) => {
-    res.json({
-        authenticated: true,
-        user: {
-            id: req.user.id,
-            email: req.user.email,
-            lastSignIn: req.user.last_sign_in_at,
-            metadata: req.user.user_metadata
-        }
-    });
-});
+
 
 // Serve auth page
 app.get('/supabase-auth.html', (req, res) => {
@@ -113,111 +53,74 @@ app.get('/diagnostic.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'diagnostic.html'));
 });
 
-// User profile routes
-app.get('/api/user/profile', authenticateSupabaseToken, async (req, res) => {
+
+// User profile routes (phone-based)
+app.get('/api/user/profile', async (req, res) => {
     try {
-        // Get user profile data from profiles table
+        const phone = req.query.phone;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
         const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', req.user.id)
+            .eq('phone', phone)
             .single();
-
         if (profileError) {
-            // If profile doesn't exist yet, return basic user data
             if (profileError.code === 'PGRST116') {
-                return res.json({
-                    id: req.user.id,
-                    name: req.user.user_metadata?.full_name || 'User',
-                    email: req.user.email,
-                    createdAt: req.user.created_at,
-                    lastLogin: req.user.last_sign_in_at
-                });
+                return res.json({ phone });
             }
             throw profileError;
         }
-
-        res.json({
-            id: req.user.id,
-            name: profileData.full_name || req.user.user_metadata?.full_name || 'User',
-            email: req.user.email,
-            createdAt: req.user.created_at,
-            lastLogin: req.user.last_sign_in_at,
-            bio: profileData.bio || '',
-            website: profileData.website || ''
-        });
-
+        res.json(profileData);
     } catch (error) {
         console.error('Error fetching user profile:', error);
         res.status(500).json({ message: 'Server error fetching profile' });
     }
 });
 
-app.put('/api/user/profile', authenticateSupabaseToken, async (req, res) => {
+app.put('/api/user/profile', async (req, res) => {
     try {
-        const { name, bio, website } = req.body;
-
-        // Update profile data
-        const profileData = {};
-        if (name) profileData.full_name = name;
-        if (bio !== undefined) profileData.bio = bio;
-        if (website !== undefined) profileData.website = website;
-
+        const { name, phone, dob, bio, website } = req.body;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
         // Check if profile exists
         const { data: existingProfile } = await supabase
             .from('profiles')
-            .select('id')
-            .eq('id', req.user.id)
+            .select('phone')
+            .eq('phone', phone)
             .single();
-
         let profileUpdateResult;
-
         if (existingProfile) {
             // Update existing profile
             profileUpdateResult = await supabase
                 .from('profiles')
                 .update({
-                    ...profileData,
+                    full_name: name,
+                    dob: dob || '',
+                    bio: bio || '',
+                    website: website || '',
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', req.user.id);
+                .eq('phone', phone);
         } else {
             // Create new profile
             profileUpdateResult = await supabase
                 .from('profiles')
                 .insert({
-                    id: req.user.id,
-                    full_name: name || req.user.user_metadata?.full_name || 'User',
+                    full_name: name,
+                    phone,
+                    dob: dob || '',
                     bio: bio || '',
                     website: website || '',
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 });
         }
-
         if (profileUpdateResult.error) {
             throw profileUpdateResult.error;
         }
-
-        // Update user metadata if name is provided
-        if (name) {
-            await supabase.auth.admin.updateUserById(req.user.id, {
-                user_metadata: {
-                    ...req.user.user_metadata,
-                    full_name: name
-                }
-            });
-        }
-
         res.json({
             message: 'Profile updated successfully',
-            user: {
-                id: req.user.id,
-                email: req.user.email,
-                name: name || req.user.user_metadata?.full_name || 'User'
-            }
+            user: { name, phone, dob }
         });
-
     } catch (error) {
         console.error('Error updating user profile:', error);
         res.status(500).json({
@@ -227,21 +130,21 @@ app.put('/api/user/profile', authenticateSupabaseToken, async (req, res) => {
     }
 });
 
-// Wellness data routes
-app.get('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
+// Wellness data routes (phone-based)
+app.get('/api/wellness/data', async (req, res) => {
     try {
+        const phone = req.query.phone;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
         // Get wellness data from wellness_data table
         const { data: wellnessData, error: wellnessDataError } = await supabase
             .from('wellness_data')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .single();
-
         if (wellnessDataError) {
-            // If wellness data doesn't exist yet, create default
             if (wellnessDataError.code === 'PGRST116') {
                 const defaultWellnessData = {
-                    user_id: req.user.id,
+                    phone,
                     wellness_scores: {
                         sleep: 80,
                         exercise: 65,
@@ -256,72 +159,61 @@ app.get('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 };
-
                 const { error: insertError } = await supabase
                     .from('wellness_data')
                     .insert(defaultWellnessData);
-
                 if (insertError) {
                     throw insertError;
                 }
-
                 return res.json(defaultWellnessData);
             }
             throw wellnessDataError;
         }
-
         // Get mood data entries
         const { data: moodData } = await supabase
             .from('mood_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get sleep data entries
         const { data: sleepData } = await supabase
             .from('sleep_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get activity entries
         const { data: activities } = await supabase
             .from('activities')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get journal entries
         const { data: journalEntries } = await supabase
             .from('journal_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get gratitude entries
         const { data: gratitudeEntries } = await supabase
             .from('gratitude_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get CBT thought entries
         const { data: cbtThoughts } = await supabase
             .from('cbt_thoughts')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false });
-
         // Get goals
         const { data: goals } = await supabase
             .from('goals')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('created_at', { ascending: false });
-
         // Combine all data
         const completeWellnessData = {
-            userId: req.user.id,
+            phone,
             wellnessData: wellnessData.wellness_scores || {
                 sleep: 80,
                 exercise: 65,
@@ -342,16 +234,14 @@ app.get('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
             },
             lastUpdated: wellnessData.updated_at
         };
-
         res.json(completeWellnessData);
-
     } catch (error) {
         console.error('Error fetching wellness data:', error);
         res.status(500).json({ message: 'Server error fetching wellness data' });
     }
 });
 
-app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/data', async (req, res) => {
     try {
         const { key, value } = req.body;
 
@@ -359,11 +249,16 @@ app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
             return res.status(400).json({ message: 'Key is required' });
         }
 
+
+        // Use phone as identifier
+        const phone = req.body.phone;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
+
         // Get existing wellness data
         const { data: wellnessData } = await supabase
             .from('wellness_data')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .single();
 
         let updateData = {};
@@ -393,7 +288,7 @@ app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
                 const { error } = await supabase
                     .from('wellness_data')
                     .update(updateData)
-                    .eq('user_id', req.user.id);
+                    .eq('phone', phone);
 
                 if (error) throw error;
             } else {
@@ -401,7 +296,7 @@ app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
                 const { error } = await supabase
                     .from('wellness_data')
                     .insert({
-                        user_id: req.user.id,
+                        phone,
                         ...updateData,
                         created_at: new Date().toISOString()
                     });
@@ -414,7 +309,7 @@ app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
                 .from(tableName)
                 .insert({
                     ...updateData,
-                    user_id: req.user.id,
+                    phone,
                     timestamp: Date.now()
                 });
 
@@ -430,12 +325,15 @@ app.post('/api/wellness/data', authenticateSupabaseToken, async (req, res) => {
 });
 
 // Wellness score API
-app.get('/api/wellness/score', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/score', async (req, res) => {
     try {
+
+        const phone = req.query.phone;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
         const { data: wellnessData, error } = await supabase
             .from('wellness_data')
             .select('wellness_scores, updated_at')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .single();
 
         if (error) {
@@ -476,13 +374,16 @@ app.get('/api/wellness/score', authenticateSupabaseToken, async (req, res) => {
 });
 
 // Wellness history API
-app.get('/api/wellness/history', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/history', async (req, res) => {
     try {
+
+        const phone = req.query.phone;
+        if (!phone) return res.status(400).json({ message: 'Phone number is required' });
         // Get mood data
         const { data: moodData } = await supabase
             .from('mood_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false })
             .limit(30); // Last 30 entries
 
@@ -490,7 +391,7 @@ app.get('/api/wellness/history', authenticateSupabaseToken, async (req, res) => 
         const { data: sleepData } = await supabase
             .from('sleep_entries')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false })
             .limit(30);
 
@@ -498,7 +399,7 @@ app.get('/api/wellness/history', authenticateSupabaseToken, async (req, res) => 
         const { data: activities } = await supabase
             .from('activities')
             .select('*')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .order('timestamp', { ascending: false })
             .limit(50);
 
@@ -506,7 +407,7 @@ app.get('/api/wellness/history', authenticateSupabaseToken, async (req, res) => 
         const { data: wellnessData } = await supabase
             .from('wellness_data')
             .select('streaks')
-            .eq('user_id', req.user.id)
+            .eq('phone', phone)
             .single();
 
         const streaks = wellnessData?.streaks || {
@@ -530,7 +431,7 @@ app.get('/api/wellness/history', authenticateSupabaseToken, async (req, res) => 
 });
 
 // Record mood API
-app.post('/api/wellness/mood', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/mood', async (req, res) => {
     try {
         const { mood, date } = req.body;
 
@@ -591,7 +492,7 @@ app.post('/api/wellness/mood', authenticateSupabaseToken, async (req, res) => {
 });
 
 // Log sleep API
-app.post('/api/wellness/sleep', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/sleep', async (req, res) => {
     try {
         const { date, bedtime, wakeTime, quality, notes } = req.body;
 
@@ -671,7 +572,7 @@ app.post('/api/wellness/sleep', authenticateSupabaseToken, async (req, res) => {
 });
 
 // Log exercise API
-app.post('/api/wellness/exercise', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/exercise', async (req, res) => {
     try {
         const { type, duration, intensity, date } = req.body;
 
@@ -768,7 +669,7 @@ app.post('/api/wellness/exercise', authenticateSupabaseToken, async (req, res) =
 });
 
 // Log mindfulness API
-app.post('/api/wellness/mindfulness', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/mindfulness', async (req, res) => {
     try {
         const { duration, type, date, notes } = req.body;
 
@@ -867,7 +768,7 @@ app.post('/api/wellness/mindfulness', authenticateSupabaseToken, async (req, res
 });
 
 // Journal entry APIs
-app.post('/api/wellness/journal', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/journal', async (req, res) => {
     try {
         const { title, content, mood, date } = req.body;
 
@@ -930,7 +831,7 @@ app.post('/api/wellness/journal', authenticateSupabaseToken, async (req, res) =>
     }
 });
 
-app.get('/api/wellness/journal', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/journal', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('journal_entries')
@@ -949,7 +850,7 @@ app.get('/api/wellness/journal', authenticateSupabaseToken, async (req, res) => 
 });
 
 // Gratitude entry APIs
-app.post('/api/wellness/gratitude', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/gratitude', async (req, res) => {
     try {
         const { items, reflection, date } = req.body;
 
@@ -986,7 +887,7 @@ app.post('/api/wellness/gratitude', authenticateSupabaseToken, async (req, res) 
     }
 });
 
-app.get('/api/wellness/gratitude', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/gratitude', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('gratitude_entries')
@@ -1005,7 +906,7 @@ app.get('/api/wellness/gratitude', authenticateSupabaseToken, async (req, res) =
 });
 
 // CBT thought APIs
-app.post('/api/wellness/cbt', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/cbt', async (req, res) => {
     try {
         const { situation, automaticThought, emotion, intensity, balancedThought, date } = req.body;
 
@@ -1045,7 +946,7 @@ app.post('/api/wellness/cbt', authenticateSupabaseToken, async (req, res) => {
     }
 });
 
-app.get('/api/wellness/cbt', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/cbt', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('cbt_thoughts')
@@ -1064,7 +965,7 @@ app.get('/api/wellness/cbt', authenticateSupabaseToken, async (req, res) => {
 });
 
 // Goals APIs
-app.post('/api/wellness/goals', authenticateSupabaseToken, async (req, res) => {
+app.post('/api/wellness/goals', async (req, res) => {
     try {
         const { text, targetDate } = req.body;
 
@@ -1102,7 +1003,7 @@ app.post('/api/wellness/goals', authenticateSupabaseToken, async (req, res) => {
     }
 });
 
-app.put('/api/wellness/goals/:id', authenticateSupabaseToken, async (req, res) => {
+app.put('/api/wellness/goals/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { completed, text, targetDate } = req.body;
@@ -1150,7 +1051,7 @@ app.put('/api/wellness/goals/:id', authenticateSupabaseToken, async (req, res) =
     }
 });
 
-app.get('/api/wellness/goals', authenticateSupabaseToken, async (req, res) => {
+app.get('/api/wellness/goals', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('goals')
@@ -1168,7 +1069,7 @@ app.get('/api/wellness/goals', authenticateSupabaseToken, async (req, res) => {
     }
 });
 
-app.delete('/api/wellness/goals/:id', authenticateSupabaseToken, async (req, res) => {
+app.delete('/api/wellness/goals/:id', async (req, res) => {
     try {
         const { id } = req.params;
 

@@ -150,16 +150,7 @@ All wellness tools and content are based on:
    npm install
    ```
 
-3. Configure environment variables:
-   Create a `.env` file in the root directory with:
-   ```
-   PORT=4000
-   MONGODB_URI=mongodb://localhost:27017/mindful-path
-   JWT_SECRET=your-secret-key-change-in-production
-   SUPABASE_URL=https://uatbksfpmbrqntbfxxkn.supabase.co
-   SUPABASE_SERVICE_KEY=your-supabase-service-key
-   ```
-
+3
 4. Configure Supabase:
    - Create a project at [supabase.com](https://supabase.com) if you don't have one
    - Update the configuration in `js/supabase-config.js`
